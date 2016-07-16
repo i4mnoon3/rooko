@@ -21,6 +21,10 @@ namespace Rooko.Core
 		void CreateTable(Table table);
 		
 		void DropTable(string tableName);
+		
+		bool SchemaExists();
+		
+		void AddColumns(string tableName, params Column[] columns);
 	}
 	
 //	public interface ITableRepository

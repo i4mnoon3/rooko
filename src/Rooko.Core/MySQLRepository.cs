@@ -90,6 +90,16 @@ namespace Rooko.Core
 			string query = string.Format("delete from schema_migrations where version = '{0}'", migration.Version);
 			ExecuteNonQuery(query);
 		}
+		
+		public bool SchemaExists()
+		{
+			throw new NotImplementedException();
+		}
+		
+		public void AddColumns(string tableName, params Column[] columns)
+		{
+			throw new NotImplementedException();
+		}
 	}
 	
 	public class MySQLTableFormatter : ITableFormatter

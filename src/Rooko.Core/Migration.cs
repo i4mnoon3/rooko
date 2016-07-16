@@ -57,8 +57,16 @@ namespace Rooko.Core
 			CreateTable(new Table(tableName, columns));
 		}
 		
+		void BuildSchema()
+		{
+			if (!Repository.SchemaExists()) {
+				Repository.CreateTable(new Table("schema_migrations", new Column("id", "integer", true, true, true), new Column("version")));
+			}
+		}
+		
 		protected void CreateTable(Table table)
 		{
+			BuildSchema();
 			if (!Repository.VersionExists(Version)) {
 				OnMigrating(new MigrationEventArgs(string.Format("Creating table {0}", table.Name)));
 				Repository.CreateTable(table);
@@ -87,6 +95,8 @@ namespace Rooko.Core
 					}
 				}
 				OnMigrating(new MigrationEventArgs(string.Format("Adding {0} to {1}", cols, tableName)));
+				Repository.AddColumns(tableName, columns);
+				Repository.Save(this);
 			}
 		}
 		
