@@ -84,12 +84,12 @@ namespace Rooko.Core
 	{
 		public void Create(Table table)
 		{
-			ExecuteNonQuery(new MySQLTableFormatter().ToCreateString(table));
+			ExecuteNonQuery(new MySQLTableFormatter().GetCreateString(table));
 		}
 		
 		public void Drop(string tableName)
 		{
-			ExecuteNonQuery(new MySQLTableFormatter().ToDropString(tableName));
+			ExecuteNonQuery(new MySQLTableFormatter().GetDropString(tableName));
 		}
 		
 		public bool Exists(string tableName)
@@ -132,7 +132,7 @@ namespace Rooko.Core
 	
 	public class MySQLTableFormatter : ITableFormatter
 	{
-		public string ToCreateString(Table table)
+		public string GetCreateString(Table table)
 		{
 			string cols = "";
 			int i = 0;
@@ -148,7 +148,7 @@ namespace Rooko.Core
 {1});", table.Name, cols);
 		}
 		
-		public string ToDropString(string tableName)
+		public string GetDropString(string tableName)
 		{
 			return string.Format("drop table {0};", tableName);
 		}

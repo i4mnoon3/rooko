@@ -30,9 +30,9 @@ namespace Rooko.Core
 	
 	public interface ITableFormatter
 	{
-		string ToCreateString(Table table);
+		string GetCreateString(Table table);
 		
-		string ToDropString(string tableName);
+		string GetDropString(string tableName);
 	}
 	
 //	public class Schema : Table
@@ -55,6 +55,27 @@ namespace Rooko.Core
 			this.Name = name;
 			this.Columns = new List<Column>(columns);
 		}
+		
+		public void AddColumn(string name)
+		{
+			AddColumn(name, "varchar(255)");
+		}
+		
+		public void AddColumn(string name, string type)
+		{
+			AddColumn(name, type, false, false, false);
+		}
+		
+		public void AddColumn(string name, string type, bool primaryKey, bool notNull, bool autoIncrement)
+		{
+			AddColumn(new Column(name, type, primaryKey, notNull, autoIncrement));
+		}
+		
+		public void AddColumn(Column column)
+		{
+			column.Table = this;
+			Columns.Add(column);
+		}
 
 		public string Name { get; set; }
 
@@ -63,11 +84,17 @@ namespace Rooko.Core
 	
 	public class Column
 	{
+		public Table Table { get; set; }
+		
 		public Column(string name) : this(name, "varchar(255)")
 		{
 		}
 		
-		public Column(string name, string type) : this(name, type, false, false, false)
+		public Column(string name, string type) : this(name, type, false)
+		{
+		}
+		
+		public Column(string name, string type, bool primaryKey) : this(name, type, primaryKey, false, false)
 		{
 		}
 		

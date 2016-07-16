@@ -22,9 +22,14 @@ namespace Rooko.Core
 		public Migration Migration { get; set; }
 	}
 	
-	public class Migration : Table
+	public class Migration// : Table
 	{
-		public Migration(string version) : base("schema_migrations", new Column("id", "integer", true, true, true), new Column("version"))
+//		public Migration(string version) : base("schema_migrations", new Column("id", "integer", true, true, true), new Column("version"))
+//		{
+//			this.Version = version;
+//		}
+		
+		public Migration(string version)
 		{
 			this.Version = version;
 		}

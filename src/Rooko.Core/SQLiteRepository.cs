@@ -28,16 +28,39 @@ namespace Rooko.Core
 		}
 	}
 	
+	public class SQLiteMigrationRepository : SQLiteTableRepository, IMigrationRepository
+	{
+		public bool ReadByVersion(string version)
+		{
+			throw new NotImplementedException();
+		}
+		
+		public Migration ReadLatest()
+		{
+			throw new NotImplementedException();
+		}
+		
+		public void Save(Migration migration)
+		{
+			throw new NotImplementedException();
+		}
+		
+		public void Delete(Migration migration)
+		{
+			throw new NotImplementedException();
+		}
+	}
+	
 	public class SQLiteTableRepository : BaseSQLiteRepository, ITableRepository
 	{
 		public void Create(Table table)
 		{
-			ExecuteNonQuery(new SQLiteTableFormatter().ToCreateString(table));
+			ExecuteNonQuery(new SqLiteTableFormatter().GetCreateString(table));
 		}
 		
 		public void Drop(string tableName)
 		{
-			ExecuteNonQuery(new SQLiteTableFormatter().ToDropString(tableName));
+			ExecuteNonQuery(new SqLiteTableFormatter().GetDropString(tableName));
 		}
 		
 		public bool Exists(string tableName)
@@ -88,9 +111,9 @@ namespace Rooko.Core
 //		}
 	}
 	
-	public class SQLiteTableFormatter : ITableFormatter
+	public class SqLiteTableFormatter : ITableFormatter
 	{
-		public string ToCreateString(Table table)
+		public string GetCreateString(Table table)
 		{
 			string cols = "";
 			int i = 0;
@@ -105,7 +128,7 @@ namespace Rooko.Core
 {1});", table.Name, cols);
 		}
 		
-		public string ToDropString(string tableName)
+		public string GetDropString(string tableName)
 		{
 			return string.Format("drop table {0};", tableName);
 		}
