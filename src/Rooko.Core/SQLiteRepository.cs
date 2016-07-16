@@ -5,13 +5,23 @@
 
 using System;
 using System.Configuration;
+using System.Data.SqlClient;
 using System.Data.SQLite;
 
 namespace Rooko.Core
 {
 	public class BaseSQLiteRepository
 	{
-		protected SQLiteConnection connection = new SQLiteConnection(ConfigurationManager.ConnectionStrings["test"].ConnectionString);
+		protected SQLiteConnection connection;
+		
+		public BaseSQLiteRepository() : this(ConfigurationManager.ConnectionStrings[ConfigurationManager.AppSettings["database"]].ConnectionString)
+		{
+		}
+		
+		public BaseSQLiteRepository(string connectionString)
+		{
+			connection = new SQLiteConnection(connectionString);
+		}
 		
 		public void ExecuteNonQuery(string query, params SQLiteParameter[] paramz)
 		{
@@ -28,50 +38,25 @@ namespace Rooko.Core
 		}
 	}
 	
-	public class SQLiteMigrationRepository : SQLiteTableRepository, IMigrationRepository
+	public class SQLiteMigrationRepository : BaseSQLiteRepository, IMigrationRepository // SQLiteTableRepository, IMigrationRepository
 	{
-		public bool ReadByVersion(string version)
+		SqLiteTableFormatter f = new SqLiteTableFormatter();
+		
+		public void CreateTable(Table table)
 		{
-			throw new NotImplementedException();
+			ExecuteNonQuery(f.GetCreateString(table));
 		}
 		
-		public Migration ReadLatest()
-		{
-			throw new NotImplementedException();
-		}
-		
-		public void Save(Migration migration)
-		{
-			throw new NotImplementedException();
-		}
-		
-		public void Delete(Migration migration)
-		{
-			throw new NotImplementedException();
-		}
-	}
-	
-	public class SQLiteTableRepository : BaseSQLiteRepository, ITableRepository
-	{
-		public void Create(Table table)
-		{
-			ExecuteNonQuery(new SqLiteTableFormatter().GetCreateString(table));
-		}
-		
-		public void Drop(string tableName)
-		{
-			ExecuteNonQuery(new SqLiteTableFormatter().GetDropString(tableName));
-		}
-		
-		public bool Exists(string tableName)
+		public bool VersionExists(string version)
 		{
 			try {
 				connection.Open();
-				string query = string.Format("select * from sqlite_master where type = 'table' and tbl_name = '{0}'", tableName);
-				SQLiteCommand cmd = new SQLiteCommand(query, connection);
-				SQLiteDataReader reader = cmd.ExecuteReader();
-				if (reader.Read()) {
-					return true;
+				string query = string.Format("select * from schema_migrations where version = '{0}'", version);
+				var cmd = new SQLiteCommand(query, connection);
+				using (var reader = cmd.ExecuteReader()) {
+					if (reader.Read()) {
+						return true;
+					}
 				}
 				return false;
 			} catch {
@@ -81,34 +66,42 @@ namespace Rooko.Core
 			}
 		}
 		
-//		public Table Read(string tableName)
-//		{
-//			try {
-//				connection.Open();
-//				string query = string.Format("select * from sqlite_master where type = 'table' and tbl_name = '{0}'", tableName);
-//				SQLiteCommand cmd = new SQLiteCommand(query, connection);
-//				SQLiteDataReader reader = cmd.ExecuteReader();
-//				Table table = null;
-//				if (reader.Read()) {
-//					table = new Table(reader["tbl_name"].ToString());
-//				}
-//				return table;
-//			} catch {
-//				throw;
-//			} finally {
-//				connection.Close();
-//			}
-//		}
+		public Migration ReadLatest()
+		{
+			try {
+				connection.Open();
+				string query = string.Format("select * from schema_migrations order by id desc");
+				var cmd = new SQLiteCommand(query, connection);
+				Migration migration = null;
+				using (var reader = cmd.ExecuteReader()) {
+					if (reader.Read()) {
+						migration = new Migration(reader.GetString(1));
+					}
+				}
+				return migration;
+			} catch {
+				throw;
+			} finally {
+				connection.Close();
+			}
+		}
 		
-//		public void Save(Table table)
-//		{
-//			ExecuteNonQuery(new SQLiteTableFormatter().ToInsertString(table));
-//		}
-//
-//		public void Delete(Table table)
-//		{
-//			ExecuteNonQuery(new SQLiteTableFormatter().ToDeleteString(table));
-//		}
+		public void Save(Migration migration)
+		{
+			string query = string.Format("insert into schema_migrations(version) values('{0}')", migration.Version);
+			ExecuteNonQuery(query);
+		}
+		
+		public void Delete(Migration migration)
+		{
+			string query = string.Format("delete from schema_migrations where version = '{0}'", migration.Version);
+			ExecuteNonQuery(query);
+		}
+		
+		public void DropTable(string tableName)
+		{
+			ExecuteNonQuery(f.GetDropString(tableName));
+		}
 	}
 	
 	public class SqLiteTableFormatter : ITableFormatter
@@ -133,33 +126,13 @@ namespace Rooko.Core
 			return string.Format("drop table {0};", tableName);
 		}
 		
-//		public string ToInsertString(Table table)
-//		{
-//			string cols = "";
-//			string vals = "";
-//			int i = 0;
-//			foreach (var c in table.Columns) {
-//				if (!c.AutoIncrement) {
-//					cols += c.Name;
-//					cols += i < table.Columns.Count - 1 ? ", " : "";
-//					vals += c.Value.GetType().IsAssignableFrom(typeof(string)) ? "'" + c.Value + "'" : c.Value;
-//				}
-//				i++;
-//			}
-//			return string.Format("insert into {0}({1}) values({2})", table.Name, cols, vals);
-//		}
-		
-//		public string ToDeleteString(Table table)
-//		{
-//			string colsVals = "";
-//			if (table.Columns.Count > 0) {
-//				colsVals += " where";
-//			}
-//			foreach (var c in table.Columns) {
-//				var val = c.Value.GetType().IsAssignableFrom(typeof(string)) ? "'" + c.Value + "'" : c.Value;
-//				colsVals += c.Name + " = " + val;
-//			}
-//			return string.Format("delete from {0}{1}", table.Name, colsVals);
-//		}
+		public string GetAddColumnString(string tableName, params Column[] columns)
+		{
+			string cols = "";
+			foreach (var c in columns) {
+				cols += c.Name + " " + c.Type;
+			}
+			return string.Format(@"alter table {0} add ", tableName, cols);
+		}
 	}
 }

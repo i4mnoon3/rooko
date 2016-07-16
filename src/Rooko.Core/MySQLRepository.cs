@@ -28,9 +28,21 @@ namespace Rooko.Core
 		}
 	}
 	
-	public class MySQLMigrationRepository : MySQLTableRepository, IMigrationRepository
+	public class MySQLMigrationRepository : BaseMySQLRepository, IMigrationRepository // MySQLTableRepository, IMigrationRepository
 	{
-		public bool ReadByVersion(string version)
+		MySQLTableFormatter f = new MySQLTableFormatter();
+		
+		public void CreateTable(Table table)
+		{
+			ExecuteNonQuery(f.GetCreateString(table));
+		}
+		
+		public void DropTable(string tableName)
+		{
+			ExecuteNonQuery(f.GetDropString(tableName));
+		}
+		
+		public bool VersionExists(string version)
 		{
 			try {
 				connection.Open();
@@ -80,56 +92,6 @@ namespace Rooko.Core
 		}
 	}
 	
-	public class MySQLTableRepository : BaseMySQLRepository, ITableRepository
-	{
-		public void Create(Table table)
-		{
-			ExecuteNonQuery(new MySQLTableFormatter().GetCreateString(table));
-		}
-		
-		public void Drop(string tableName)
-		{
-			ExecuteNonQuery(new MySQLTableFormatter().GetDropString(tableName));
-		}
-		
-		public bool Exists(string tableName)
-		{
-			try {
-				connection.Open();
-				string query = string.Format("select * from information_schema.tables where table_schema = '{0}' and table_name = '{1}'", connection.Database, tableName);
-				MySqlCommand cmd = new MySqlCommand(query, connection);
-				MySqlDataReader reader = cmd.ExecuteReader();
-				if (reader.Read()) {
-					return true;
-				}
-				return false;
-			} catch {
-				throw;
-			} finally {
-				connection.Close();
-			}
-		}
-		
-		public Table Read(string tableName)
-		{
-			try {
-				connection.Open();
-				string query = string.Format("select * from information_schema.tables where table_schema = '{0}' and table_name = '{1}'", connection.Database, tableName);
-				MySqlCommand cmd = new MySqlCommand(query, connection);
-				MySqlDataReader reader = cmd.ExecuteReader();
-				Table table = null;
-				if (reader.Read()) {
-					table = new Table(reader["table_name"].ToString());
-				}
-				return table;
-			} catch {
-				throw;
-			} finally {
-				connection.Close();
-			}
-		}
-	}
-	
 	public class MySQLTableFormatter : ITableFormatter
 	{
 		public string GetCreateString(Table table)
@@ -153,35 +115,9 @@ namespace Rooko.Core
 			return string.Format("drop table {0};", tableName);
 		}
 		
-//		public string ToInsertString(Table table)
-//		{
-//			string cols = "";
-//			string vals = "";
-//			int i = 0;
-//			foreach (var c in table.Columns) {
-//				if (!c.AutoIncrement) {
-//					cols += c.Name;
-//					cols += i < table.Columns.Count - 1 ? ", " : "";
-//					vals += c.Value.GetType().IsAssignableFrom(typeof(string)) ? "'" + c.Value + "'" : c.Value;
-//				}
-//				i++;
-//			}
-//			return string.Format("insert into {0}({1}) values({2})", table.Name, cols, vals);
-//		}
-//		
-//		public string ToDeleteString(Table table)
-//		{
-//			string colsVals = "";
-//			if (table.Columns.Count > 0) {
-//				colsVals += " where";
-//			}
-//			foreach (var c in table.Columns) {
-//				if (c.PrimaryKey) {
-//					var val = c.Value.GetType().IsAssignableFrom(typeof(string)) ? "'" + c.Value + "'" : c.Value;
-//					colsVals += " " + c.Name + " = " + val;
-//				}
-//			}
-//			return string.Format("delete from {0}{1}", table.Name, colsVals);
-//		}
+		public string GetAddColumnString(string tableName, params Column[] columns)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

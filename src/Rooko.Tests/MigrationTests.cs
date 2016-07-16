@@ -15,20 +15,47 @@ namespace Rooko.Tests
 	[TestFixture]
 	public class MigrationTests
 	{
+		CreateItems m1;
+		AddPriceToItems m2;
+		
+		[SetUpAttribute]
+		public void Setup()
+		{
+			m1 = new CreateItems();
+			m1.Migrating += delegate(object sender, MigrationEventArgs e) {
+				Console.WriteLine(e.Message);
+			};
+			m1.Repository = new SQLiteMigrationRepository();
+			
+			m2 = new AddPriceToItems();
+			m2.Migrating += delegate(object sender, MigrationEventArgs e) {
+				Console.WriteLine(e.Message);
+			};
+			m2.Repository = new SQLiteMigrationRepository();
+		}
+		
 		[Test]
 		public void TestCreateItemsMigrate()
 		{
-			var m = new CreateItems();
-			m.Repository = new MySQLMigrationRepository();
-			m.Migrate();
+			m1.Migrate();
 		}
 		
 		[Test]
 		public void TestCreateItemsRollback()
 		{
-			var m =  new CreateItems();
-			m.Repository = new MySQLMigrationRepository();
-			m.Rollback();
+			m1.Rollback();
+		}
+		
+		[Test]
+		public void TestAddPriceToItemsMigrate()
+		{
+			m2.Migrate();
+		}
+		
+		[Test]
+		public void TestAddPriceToItemsRollback()
+		{
+			m2.Rollback();
 		}
 	}
 	
@@ -63,13 +90,11 @@ namespace Rooko.Tests
 		
 		public override void Migrate()
 		{
-			base.Migrate();
 			AddColumn("items", new Column("price", "double"));
 		}
 		
 		public override void Rollback()
 		{
-			base.Rollback();
 			RemoveColumn("items", "price");
 		}
 	}

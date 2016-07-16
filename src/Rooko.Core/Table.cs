@@ -8,45 +8,38 @@ using System.Collections.Generic;
 
 namespace Rooko.Core
 {
-	public interface IMigrationRepository : ITableRepository
+	public interface IMigrationRepository// : ITableRepository
 	{
-		bool ReadByVersion(string version);
+		bool VersionExists(string version);
 		
 		Migration ReadLatest();
 		
 		void Save(Migration migration);
 		
 		void Delete(Migration migration);
+		
+		void CreateTable(Table table);
+		
+		void DropTable(string tableName);
 	}
 	
-	public interface ITableRepository
-	{
-		void Create(Table table);
-		
-		void Drop(string tableName);
-		
-		bool Exists(string tableName);
-	}
+//	public interface ITableRepository
+//	{
+//		void Create(Table table);
+//		
+//		void Drop(string tableName);
+//		
+//		bool Exists(string tableName);
+//	}
 	
 	public interface ITableFormatter
 	{
 		string GetCreateString(Table table);
 		
 		string GetDropString(string tableName);
+		
+		string GetAddColumnString(string tableName, params Column[] columns);
 	}
-	
-//	public class Schema : Table
-//	{
-//		public Schema(string version) 
-//			: base("schema_migrations", new Column("id", "integer", true, true, true), new Column("version") { Value = version })
-//		{
-//			this.Version = version;
-//		}
-//		
-//		public int Id { get; set; }
-//		
-//		public string Version { get; set; }
-//	}
 	
 	public class Table
 	{

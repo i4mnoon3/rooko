@@ -14,21 +14,18 @@ namespace Rooko.Core
 {
 	public class MigrationEventArgs : EventArgs
 	{
-		public MigrationEventArgs(Migration migration)
+		public MigrationEventArgs(string message)
 		{
-			this.Migration = migration;
+			this.Message = message;
 		}
 		
 		public Migration Migration { get; set; }
+		
+		public string Message { get; set; }
 	}
 	
-	public class Migration// : Table
+	public class Migration
 	{
-//		public Migration(string version) : base("schema_migrations", new Column("id", "integer", true, true, true), new Column("version"))
-//		{
-//			this.Version = version;
-//		}
-		
 		public Migration(string version)
 		{
 			this.Version = version;
@@ -62,18 +59,50 @@ namespace Rooko.Core
 		
 		protected void CreateTable(Table table)
 		{
-			if (!Repository.Exists(Name)) {
-				Repository.Create(this);
+			if (!Repository.VersionExists(Version)) {
+				OnMigrating(new MigrationEventArgs(string.Format("Creating table {0}", table.Name)));
+				Repository.CreateTable(table);
+				Repository.Save(this);
 			}
-			OnMigrating(new MigrationEventArgs(this));
-			Repository.Create(table);
-			Repository.Save(this);
 		}
 		
 		protected void DropTable(string tableName)
 		{
-			Repository.Drop(tableName);
-			Repository.Delete(this);
+			if (Repository.VersionExists(Version)) {
+				OnMigrating(new MigrationEventArgs(string.Format("Dropping table {0}", tableName)));
+				Repository.DropTable(tableName);
+				Repository.Delete(this);
+			}
+		}
+		
+		protected void AddColumn(string tableName, params Column[] columns)
+		{
+			if (!Repository.VersionExists(Version)) {
+				string cols = "";
+				int i = 0;
+				foreach (var c in columns) {
+					cols += c.Name;
+					if (i++ < columns.Length - 1) {
+						cols += ", ";
+					}
+				}
+				OnMigrating(new MigrationEventArgs(string.Format("Adding {0} to {1}", cols, tableName)));
+			}
+		}
+		
+		public void RemoveColumn(string tableName, params string[] columns)
+		{
+			if (!Repository.VersionExists(Version)) {
+				string cols = "";
+				int i = 0;
+				foreach (var c in columns) {
+					cols += c;
+					if (i++ < columns.Length - 1) {
+						cols += ", ";
+					}
+				}
+				OnMigrating(new MigrationEventArgs(string.Format("Removing {0} from {1}", cols, tableName)));
+			}
 		}
 	}
 }

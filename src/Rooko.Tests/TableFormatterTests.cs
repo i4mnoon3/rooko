@@ -29,21 +29,21 @@ namespace Rooko.Tests
 		}
 		
 		[Test]
-		public void TestCreateString()
+		public void TestGetCreateString()
 		{
 			Console.WriteLine(f.GetCreateString(t));
 		}
 		
 		[Test]
-		public void TestDropString()
+		public void TestGetDropString()
 		{
 			Console.WriteLine(f.GetDropString("items"));
 		}
 		
 		[Test]
-		public void Test()
+		public void TestGetAddColumnString()
 		{
-			Console.WriteLine(f.ToAddColumnString("items", new Column("price", "double")));
+			Console.WriteLine(f.GetAddColumnString("items", new Column("price", "double")));
 		}
 	}
 }
