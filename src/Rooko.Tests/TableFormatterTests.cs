@@ -16,34 +16,37 @@ namespace Rooko.Tests
 	public class TableFormatterTests
 	{
 		Table t;
-		SqLiteTableFormatter f = new SqLiteTableFormatter();
+		SqlTableFormatter s = new SqlTableFormatter();
+		MySQLTableFormatter m = new MySQLTableFormatter();
 		
 		[SetUp]
 		public void Setup()
 		{
-			t = new Table("items");
+			t = new Table("users");
 			t.AddColumn("id", "integer", true, true, true);
 			t.AddColumn("name");
-			t.AddColumn("description");
-			t.AddColumn("price", "double");
+			t.AddColumn("password");
 		}
 		
 		[Test]
-		public void TestGetCreateString()
+		public void TestGetCreateTable()
 		{
-			Console.WriteLine(f.GetCreateString(t));
+			Console.WriteLine(s.GetCreateTable(t));
+			Console.WriteLine(s.GetDropTable("users"));
 		}
 		
 		[Test]
-		public void TestGetDropString()
+		public void TestGetAddColumn()
 		{
-			Console.WriteLine(f.GetDropString("items"));
+			Console.WriteLine(s.GetAddColumn("users", new Column("username"), new Column("salt")));
+			Console.WriteLine(s.GetDropColumn("users", "username", "salt"));
 		}
 		
 		[Test]
-		public void TestGetAddColumnString()
+		public void TestGetInsert()
 		{
-			Console.WriteLine(f.GetAddColumnString("items", new Column("price", "double")));
+			Console.WriteLine(s.GetInsert("users", new Column { Name = "username", Value = "admin" }, new Column { Name = "password", Value = "root" }));
+			Console.WriteLine(s.GetDelete("users", new Column { Name = "username", Value = "admin" }, new Column { Name = "password", Value = "root" }));
 		}
 	}
 }

@@ -15,9 +15,9 @@ namespace Rooko.Core
 	{
 		protected SQLiteConnection connection;
 		
-		public BaseSQLiteRepository() : this(ConfigurationManager.ConnectionStrings[ConfigurationManager.AppSettings["database"]].ConnectionString)
-		{
-		}
+//		public BaseSQLiteRepository() : this(ConfigurationManager.ConnectionStrings[ConfigurationManager.AppSettings["database"]].ConnectionString)
+//		{
+//		}
 		
 		public BaseSQLiteRepository(string connectionString)
 		{
@@ -67,11 +67,11 @@ namespace Rooko.Core
 	
 	public class SQLiteMigrationRepository : BaseSQLiteRepository, IMigrationRepository // SQLiteTableRepository, IMigrationRepository
 	{
-		SqLiteTableFormatter f = new SqLiteTableFormatter();
+		SQLiteTableFormatter f = new SQLiteTableFormatter();
 		
-		public SQLiteMigrationRepository() : base()
-		{
-		}
+//		public SQLiteMigrationRepository() : base()
+//		{
+//		}
 		
 		public SQLiteMigrationRepository(string connectionString) : base(connectionString)
 		{
@@ -79,7 +79,7 @@ namespace Rooko.Core
 		
 		public void CreateTable(Table table)
 		{
-			ExecuteNonQuery(f.GetCreateString(table));
+			ExecuteNonQuery(f.GetCreateTable(table));
 		}
 		
 		public bool SchemaExists()
@@ -151,7 +151,7 @@ namespace Rooko.Core
 		
 		public void DropTable(string tableName)
 		{
-			ExecuteNonQuery(f.GetDropString(tableName));
+			ExecuteNonQuery(f.GetDropTable(tableName));
 		}
 		
 		public void AddColumns(string tableName, params Column[] columns)
@@ -163,11 +163,28 @@ namespace Rooko.Core
 			string query = string.Format("alter table {0} add {1}", tableName, cols);
 			ExecuteNonQuery(query);
 		}
+		
+		public void RemoveColumns(string tableName, params string[] columns)
+		{
+			string query = string.Format("alter table {0} drop column", tableName);
+			ExecuteNonQuery(query);
+		}
+		
+		public void Insert(string tableName, params Column[] columns)
+		{
+			string query = string.Format(@"");
+			ExecuteNonQuery(query);
+		}
+		
+		public void Delete(string tableName, params Column[] columns)
+		{
+			throw new NotImplementedException();
+		}
 	}
 	
-	public class SqLiteTableFormatter : ITableFormatter
+	public class SQLiteTableFormatter : ITableFormatter
 	{
-		public string GetCreateString(Table table)
+		public string GetCreateTable(Table table)
 		{
 			string cols = "";
 			int i = 0;
@@ -182,18 +199,35 @@ namespace Rooko.Core
 {1});", table.Name, cols);
 		}
 		
-		public string GetDropString(string tableName)
+		public string GetDropTable(string tableName)
 		{
 			return string.Format("drop table {0};", tableName);
 		}
 		
-		public string GetAddColumnString(string tableName, params Column[] columns)
+		public string GetAddColumn(string tableName, params Column[] columns)
 		{
 			string cols = "";
+			int i = 0;
 			foreach (var c in columns) {
-				cols += c.Name + " " + c.Type;
+				cols += string.Format("alter table {0} add {1} {2}", tableName, c.Name, c.Type);
+				if (i++ < columns.Length - 1) {
+					cols += ";" + Environment.NewLine;
+				}
 			}
-			return string.Format(@"alter table {0} add ", tableName, cols);
+			return cols;
+		}
+		
+		public string GetDropColumn(string tableName, params string[] columns)
+		{
+			string cols = "";
+			int i = 0;
+			foreach (var c in columns) {
+				cols += string.Format("alter table {0} remove column {1}", tableName, c);
+				if (i++ < columns.Length - 1) {
+					cols += ";" + Environment.NewLine;
+				}
+			}
+			return cols;
 		}
 	}
 }

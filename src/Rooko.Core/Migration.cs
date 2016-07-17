@@ -112,7 +112,23 @@ namespace Rooko.Core
 					}
 				}
 				OnMigrating(new MigrationEventArgs(string.Format("Removing {0} from {1}", cols, tableName)));
+				Repository.RemoveColumns(tableName, columns);
+				Repository.Delete(this);
 			}
+		}
+		
+		public void Insert(string tableName, params Column[] columns)
+		{
+			if (!Repository.VersionExists(Version)) {
+				OnMigrating(new MigrationEventArgs(""));
+				Repository.Insert(tableName, columns);
+				Repository.Save(this);
+			}
+		}
+		
+		public void Delete(string tableName, params Column[] columns)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

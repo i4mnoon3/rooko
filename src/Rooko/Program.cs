@@ -15,15 +15,18 @@ namespace Rooko
 	{
 		private static void Main(string[] args)
 		{
-//			Console.WriteLine(args.Length);
 			if (args.Length >= 4) {
 				string command = args[0], assembly = args[1], connectionString = args[2], providerName =  args[3];
-				var m = new Migrator(Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), assembly)), lalala(providerName, connectionString));
+				var m = new Migrator(Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), assembly)), GetMigrationRepository(providerName, connectionString));
 				m.Migrating += delegate(object sender, MigrationEventArgs e) {
 					Console.WriteLine(e.Message);
 				};
-				if (args[0] == "migrate") {
+				if (command == "migrate") {
 					m.Migrate();
+				} else if (command == "rollback") {
+					m.Rollback();
+				} else {
+					throw new NotSupportedException();
 				}
 			}
 			#if DEBUG
@@ -31,7 +34,7 @@ namespace Rooko
 			#endif
 		}
 		
-		static IMigrationRepository lalala(string providerName,string connectionString)
+		static IMigrationRepository GetMigrationRepository(string providerName,string connectionString)
 		{
 			if(providerName == "System.Data.SQLite") {
 				return new SQLiteMigrationRepository(connectionString);

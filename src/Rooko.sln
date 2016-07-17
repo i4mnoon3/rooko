@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-# SharpDevelop 4.2.0.8774-RC
+# SharpDevelop 4.4
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rooko", "Rooko\Rooko.csproj", "{837BFA52-1246-428F-B5AF-70CEEBA7D888}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rooko.Core", "Rooko.Core\Rooko.Core.csproj", "{EAAB5645-57D7-4F59-95D4-A54E765C1447}"

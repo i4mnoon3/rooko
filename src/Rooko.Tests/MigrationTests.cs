@@ -15,23 +15,23 @@ namespace Rooko.Tests
 	[TestFixture]
 	public class MigrationTests
 	{
-		CreateItems m1;
-		AddPriceToItems m2;
+		CreateUsers m1;
+		AddUsernameToUsers m2;
 		
 		[SetUpAttribute]
 		public void Setup()
 		{
-			m1 = new CreateItems();
+			m1 = new CreateUsers();
 			m1.Migrating += delegate(object sender, MigrationEventArgs e) {
 				Console.WriteLine(e.Message);
 			};
-			m1.Repository = new SQLiteMigrationRepository();
+			m1.Repository = new SQLiteMigrationRepository("data source=db.sqlite");
 			
-			m2 = new AddPriceToItems();
+			m2 = new AddUsernameToUsers();
 			m2.Migrating += delegate(object sender, MigrationEventArgs e) {
 				Console.WriteLine(e.Message);
 			};
-			m2.Repository = new SQLiteMigrationRepository();
+			m2.Repository = new SQLiteMigrationRepository("data source=db.sqlite");
 		}
 		
 		[Test]
@@ -59,43 +59,67 @@ namespace Rooko.Tests
 		}
 	}
 	
-	public class CreateItems : Migration
+	public class CreateUsers : Migration
 	{
-		public CreateItems() : base("E128A916-A06E-4142-B73D-DD0E6811D618")
+		public CreateUsers() : base("E128A916-A06E-4142-B73D-DD0E6811D618")
 		{
 		}
 		
 		public override void Migrate()
 		{
 			CreateTable(
-				"items",
+				"users",
 				new Column("id", "integer", true, true, true),
 				new Column("name"),
-				new Column("description"),
-				new Column("cost", "double")
+				new Column("password")
 			);
 		}
 		
 		public override void Rollback()
 		{
-			DropTable("items");
+			DropTable("users");
 		}
 	}
 	
-	public class AddPriceToItems : Migration
+	public class AddUsernameToUsers : Migration
 	{
-		public AddPriceToItems() : base("DA8965AD-31E3-4085-8125-8396758C4A82")
+		public AddUsernameToUsers() : base("DA8965AD-31E3-4085-8125-8396758C4A82")
 		{
 		}
 		
 		public override void Migrate()
 		{
-			AddColumn("items", new Column("price", "double"));
+			AddColumn("users", new Column("username"));
 		}
 		
 		public override void Rollback()
 		{
-			RemoveColumn("items", "price");
+			RemoveColumn("users");
+		}
+	}
+	
+	public class InsertRootUser : Migration
+	{
+		public InsertRootUser() : base("116AA4B6-5DEE-4621-8D39-DB0FC5D9110E")
+		{
+		}
+		
+		public override void Migrate()
+		{
+			Insert(
+				"users",
+				new Column { Name = "username", Value = "root" },
+				new Column { Name = "password", Value = "password" }
+			);
+		}
+		
+		public override void Rollback()
+		{
+			Delete(
+				"users",
+				new Column { Name = "username", Value = "root" },
+				new Column { Name = "password", Value = "password" }
+			);
 		}
 	}
 }

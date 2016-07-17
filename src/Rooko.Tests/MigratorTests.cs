@@ -16,14 +16,14 @@ namespace Rooko.Tests
 		[Test]
 		public void TestMigrate()
 		{
-			Migrator m = new Migrator(Assembly.GetExecutingAssembly(), new SQLiteMigrationRepository());
+			Migrator m = new Migrator(Assembly.GetExecutingAssembly(), new SQLiteMigrationRepository("data source=db.sqlite"));
 			m.Migrate();
 		}
 		
 		[Test]
 		public void TestRollback()
 		{
-			Migrator m = new Migrator(Assembly.LoadFile(@"C:\ian\projects\nbooks\trunk\bin\NBooks.Core.dll"), new MySQLMigrationRepository());
+			Migrator m = new Migrator(Assembly.GetExecutingAssembly(), new SQLiteMigrationRepository("data source=db.sqlite"));
 			m.Rollback();
 		}
 	}
