@@ -11,29 +11,33 @@ It'll be copied into your solution. The best practice is to create a migration l
 ## Add a migration
 This is an example of a migration class
 
-	public class CreateUsers : Migration
+```cs
+public class CreateUsers : Rooko.Core.Migration
+{
+	public CreateUsers() : base("E128A916-A06E-4142-B73D-DD0E6811D618")
 	{
-		public CreateUsers() : base("E128A916-A06E-4142-B73D-DD0E6811D618")
-		{
-		}
-		
-		public override void Migrate()
-		{
-			CreateTable(
-				"users",
-				new Column("id", "integer", true, true, true),
-				new Column("name"),
-				new Column("password")
-			);
-		}
-		
-		public override void Rollback()
-		{
-			DropTable("users");
-		}
 	}
+	
+	public override void Migrate()
+	{
+		CreateTable(
+			"users",
+			new Column("id", "integer", true, true, true),
+			new Column("name"),
+			new Column("password")
+		);
+	}
+	
+	public override void Rollback()
+	{
+		DropTable("users");
+	}
+}
+```
 
 Going to the output of this folder after compiling and running
 
-rooko migrate "Server=.;Database=test;Trusted_Connection=True;" "System.Data.SqlClient"
+```
+> rooko migrate "Server=.;Database=test;Trusted_Connection=True;" "System.Data.SqlClient"
+```
 
