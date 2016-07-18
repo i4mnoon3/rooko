@@ -41,3 +41,10 @@ Going to the output of this folder after compiling and running
 > rooko migrate "Server=.;Database=test;Trusted_Connection=True;" "System.Data.SqlClient"
 ```
 
+This will create a users table with id, name, and password columns specified in the Migrate method.
+
+In any case you want to rollback the migration, you can do so by
+
+```
+> rooko migrate "Server=.;Database=test;Trusted_Connection=True;" "System.Data.SqlClient"
+```
