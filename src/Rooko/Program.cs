@@ -28,10 +28,26 @@ namespace Rooko
 				} else {
 					throw new NotSupportedException();
 				}
+				#if DEBUG
+				Console.Write("Press any key to continue...");
+				Console.ReadLine();
+				#endif
+			} else if (args.Length == 1 && args[0] == "-v") {
+				Console.WriteLine(Assembly.GetExecutingAssembly().GetName().Version);
+			} else {
+				Console.WriteLine(@"Rooko is a simple database migration tool for .Net.
+  Usage:
+  	rook -v
+    rooko command [library] [connection_string] [provider_name]
+    
+  Examples:
+  	rooko migrate 'Rooko.Tests.dll' 'Server=.;Database=eform;Trusted_Connection=True;' 'System.Data.SqlClient'
+  	rooko rollback 'Rooko.Tests.dll' 'Server=.;Database=eform;Trusted_Connection=True;' 'System.Data.SqlClient'
+  	
+  Further Information:
+    https://github.com/iescarro/rooko
+");
 			}
-			#if DEBUG
-			Console.ReadLine();
-			#endif
 		}
 		
 		static IMigrationRepository GetMigrationRepository(string providerName,string connectionString)
@@ -39,7 +55,9 @@ namespace Rooko
 			if(providerName == "System.Data.SQLite") {
 				return new SQLiteMigrationRepository(connectionString);
 			} else if (providerName == "MySql.Data.MySqlClient"){
-				return new MySQLMigrationRepository();
+				return new MySQLMigrationRepository(connectionString);
+			} else if (providerName == "System.Data.SqlClient") {
+				return new SqlMigrationRepository(connectionString);
 			} else {
 				throw new NotSupportedException();
 			}
