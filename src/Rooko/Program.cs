@@ -41,8 +41,8 @@ namespace Rooko
     rooko command [library] [connection_string] [provider_name]
     
   Examples:
-  	rooko migrate 'Rooko.Tests.dll' 'Server=.;Database=eform;Trusted_Connection=True;' 'System.Data.SqlClient'
-  	rooko rollback 'Rooko.Tests.dll' 'Server=.;Database=eform;Trusted_Connection=True;' 'System.Data.SqlClient'
+  	rooko migrate 'Rooko.Tests.dll' 'Server=.;Database=test;Trusted_Connection=True;' 'System.Data.SqlClient'
+  	rooko rollback 'Rooko.Tests.dll' 'Server=.;Database=test=True;' 'System.Data.SqlClient'
   	
   Further Information:
     https://github.com/iescarro/rooko
