@@ -4,7 +4,9 @@ Simple database migration library
 ## Install
 Install the rooko library from nuget
 
+```
 PM> Install-Package Rooko.Core.dll
+```
 
 It'll be copied into your solution. The best practice is to create a migration library so if you have application project such as MyApplication, you create a migration library as MyApplication.Migrations. Compile this as a .dll
 

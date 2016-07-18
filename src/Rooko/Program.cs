@@ -36,13 +36,14 @@ namespace Rooko
 				Console.WriteLine(Assembly.GetExecutingAssembly().GetName().Version);
 			} else {
 				Console.WriteLine(@"Rooko is a simple database migration tool for .Net.
+
   Usage:
-  	rook -v
+    rook -v
     rooko command [library] [connection_string] [provider_name]
     
   Examples:
-  	rooko migrate 'Rooko.Tests.dll' 'Server=.;Database=test;Trusted_Connection=True;' 'System.Data.SqlClient'
-  	rooko rollback 'Rooko.Tests.dll' 'Server=.;Database=test=True;' 'System.Data.SqlClient'
+    rooko migrate ""Rooko.Tests.dll"" ""Server=.;Database=test;Trusted_Connection=True;"" ""System.Data.SqlClient""
+    rooko rollback ""Rooko.Tests.dll"" ""Server=.;Database=test;Trusted_Connection=True;"" ""System.Data.SqlClient""
   	
   Further Information:
     https://github.com/iescarro/rooko
