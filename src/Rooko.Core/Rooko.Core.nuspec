@@ -2,12 +2,12 @@
 <package >
   <metadata>
     <id>Rooko.Core.dll</id>
-    <version>0.1</version>
+    <version>0.2</version>
     <title></title>
     <authors>Ian Escarro</authors>
     <owners>Ian Escarro</owners>
     <licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>
-    <projectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</projectUrl>
+    <projectUrl>https://github.com/iescarro/rooko</projectUrl>
     <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Database migration tool</description>
