@@ -12,7 +12,13 @@ namespace Rooko.Core
 {
 	public class BaseMySQLRepository
 	{
-		protected MySqlConnection connection = new MySqlConnection(ConfigurationManager.ConnectionStrings["test"].ConnectionString);
+//		protected MySqlConnection connection = new MySqlConnection(ConfigurationManager.ConnectionStrings["test"].ConnectionString);
+		protected MySqlConnection connection;
+		
+		public BaseMySQLRepository(string connectionString)
+		{
+			connection = new MySqlConnection(connectionString);
+		}
 		
 		public void ExecuteNonQuery(string query, params MySqlParameter[] paramz)
 		{
@@ -46,7 +52,7 @@ namespace Rooko.Core
 		{
 			try {
 				OpenConnection();
-				MySqlCommand cmd = new MySqlCommand(query, connection);
+				var cmd = new MySqlCommand(query, connection);
 				cmd.Parameters.AddRange(paramz);
 				return cmd.ExecuteReader();
 			} catch {
@@ -57,26 +63,16 @@ namespace Rooko.Core
 		}
 	}
 	
-	public class MySQLMigrationRepository : BaseMySQLRepository, IMigrationRepository // MySQLTableRepository, IMigrationRepository
+	public class MySQLMigrationRepository : BaseMySQLRepository, IMigrationRepository
 	{
-		MySQLTableFormatter f = new MySQLTableFormatter();
+		MySQLMigrationFormatter f = new MySQLMigrationFormatter();
+		
+		public MySQLMigrationRepository(string connectionString) : base(connectionString)
+		{
+		}
 		
 		public bool VersionExists(string version)
 		{
-//			try {
-//				connection.Open();
-//				string query = string.Format("select * from schema_migrations where version = '{0}'", version);
-//				MySqlCommand cmd = new MySqlCommand(query, connection);
-//				MySqlDataReader reader = cmd.ExecuteReader();
-//				if (reader.Read()) {
-//					return true;
-//				}
-//				return false;
-//			} catch {
-//				throw;
-//			} finally {
-//				connection.Close();
-//			}
 			string query = string.Format("select * from schema_migrations where version = '{0}'", version);
 			using (var r = ExecuteReader(query)) {
 				if (r.Read()) {
@@ -88,21 +84,6 @@ namespace Rooko.Core
 		
 		public Migration ReadLatest()
 		{
-//			try {
-//				connection.Open();
-//				string query = string.Format("select * from schema_migrations order by id desc");
-//				MySqlCommand cmd = new MySqlCommand(query, connection);
-//				MySqlDataReader reader = cmd.ExecuteReader();
-//				Migration migration = null;
-//				if (reader.Read()) {
-//					migration = new Migration(reader.GetString(1));
-//				}
-//				return migration;
-//			} catch {
-//				throw;
-//			} finally {
-//				connection.Close();
-//			}
 			string query = string.Format("select * from schema_migrations order by id desc");
 			Migration m = null;
 			using (var r = ExecuteReader(query)) {
@@ -142,11 +123,6 @@ namespace Rooko.Core
 		
 		public void AddColumns(string tableName, params Column[] columns)
 		{
-//			string cols = "";
-//			foreach (var c in columns) {
-//				cols += c.Name + " " + c.Type + " ";
-//			}
-//			string query = string.Format("alter table {0} add ", tableName, cols);
 			ExecuteNonQuery(f.GetAddColumn(tableName, columns));
 		}
 		
@@ -171,7 +147,7 @@ namespace Rooko.Core
 		}
 	}
 	
-	public class MySQLTableFormatter : ITableFormatter
+	public class MySQLMigrationFormatter : IMigrationFormatter
 	{
 		public string GetCreateTable(Table table)
 		{

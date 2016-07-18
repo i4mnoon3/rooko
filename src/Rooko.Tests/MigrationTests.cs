@@ -1,11 +1,8 @@
-﻿/*
- * Created by SharpDevelop.
- * User: Dev
- * Date: 7/16/2016
- * Time: 9:27 AM
- * 
- * To change this template use Tools | Options | Coding | Edit Standard Headers.
- */
+﻿//	<file>
+//		<license></license>
+//		<owner name="Ian Escarro" email="ian.escarro@gmail.com"/>
+//	</file>
+
 using System;
 using NUnit.Framework;
 using Rooko.Core;

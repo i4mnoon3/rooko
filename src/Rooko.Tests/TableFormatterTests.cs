@@ -1,11 +1,8 @@
-﻿/*
- * Created by SharpDevelop.
- * User: Dev
- * Date: 7/16/2016
- * Time: 9:46 AM
- * 
- * To change this template use Tools | Options | Coding | Edit Standard Headers.
- */
+﻿//	<file>
+//		<license></license>
+//		<owner name="Ian Escarro" email="ian.escarro@gmail.com"/>
+//	</file>
+
 using System;
 using NUnit.Framework;
 using Rooko.Core;
@@ -16,8 +13,8 @@ namespace Rooko.Tests
 	public class TableFormatterTests
 	{
 		Table t;
-		SqlTableFormatter s = new SqlTableFormatter();
-		MySQLTableFormatter m = new MySQLTableFormatter();
+		SqlMigrationFormatter s = new SqlMigrationFormatter();
+		MySQLMigrationFormatter m = new MySQLMigrationFormatter();
 		
 		[SetUp]
 		public void Setup()
@@ -26,6 +23,11 @@ namespace Rooko.Tests
 			t.AddColumn("id", "integer", true, true, true);
 			t.AddColumn("name");
 			t.AddColumn("password");
+		}
+		
+		[TearDown]
+		public void Dispose()
+		{
 		}
 		
 		[Test]

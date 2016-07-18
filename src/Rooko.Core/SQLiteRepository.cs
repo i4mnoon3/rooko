@@ -15,10 +15,6 @@ namespace Rooko.Core
 	{
 		protected SQLiteConnection connection;
 		
-//		public BaseSQLiteRepository() : this(ConfigurationManager.ConnectionStrings[ConfigurationManager.AppSettings["database"]].ConnectionString)
-//		{
-//		}
-		
 		public BaseSQLiteRepository(string connectionString)
 		{
 			connection = new SQLiteConnection(connectionString);
@@ -67,7 +63,7 @@ namespace Rooko.Core
 	
 	public class SQLiteMigrationRepository : BaseSQLiteRepository, IMigrationRepository // SQLiteTableRepository, IMigrationRepository
 	{
-		SQLiteTableFormatter f = new SQLiteTableFormatter();
+		SQLiteMigrationFormatter f = new SQLiteMigrationFormatter();
 		
 //		public SQLiteMigrationRepository() : base()
 //		{
@@ -182,7 +178,7 @@ namespace Rooko.Core
 		}
 	}
 	
-	public class SQLiteTableFormatter : ITableFormatter
+	public class SQLiteMigrationFormatter : IMigrationFormatter
 	{
 		public string GetCreateTable(Table table)
 		{

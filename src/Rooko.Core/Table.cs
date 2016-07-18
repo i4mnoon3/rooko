@@ -89,9 +89,9 @@ namespace Rooko.Core
 	
 	public class MigrationRepostory : BaseMigrationRepository, IMigrationRepository
 	{
-		ITableFormatter f;
+		IMigrationFormatter f;
 		
-		public MigrationRepostory(ITableFormatter f)
+		public MigrationRepostory(IMigrationFormatter f)
 		{
 			this.f = f;
 		}
@@ -161,7 +161,7 @@ namespace Rooko.Core
 		}
 	}
 	
-	public interface ITableFormatter
+	public interface IMigrationFormatter
 	{
 		string GetCreateTable(Table table);
 		
