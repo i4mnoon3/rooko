@@ -38,7 +38,8 @@ namespace Rooko
 					if (subCommand == "migration") {
 						string fileName = string.Format("{1}{0}.cs", name, DateTime.Now.ToString("yyyyMMddHHmm"));
 						using (var s = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), fileName))) {
-							s.WriteLine(@"using System;
+							s.WriteLine(
+								@"using System;
 using Rooko.Core;
 
 namespace Migrations
@@ -60,15 +61,17 @@ namespace Migrations
 		}}
 	}}
 }}",
-							           name,
-							           Guid.NewGuid().ToString());
+								name,
+								Guid.NewGuid().ToString()
+							);
 						}
 					}
 				}
 			} else if (args.Length == 1 && args[0] == "-v") {
 				Console.WriteLine(Assembly.GetExecutingAssembly().GetName().Version);
 			} else {
-				Console.WriteLine(@"Rooko is a simple database migration tool for .Net.
+				Console.WriteLine(
+					@"Rooko is a simple database migration tool for .Net.
 
   Usage:
     rook -v
@@ -81,7 +84,8 @@ namespace Migrations
 
   Further Information:
     https://github.com/iescarro/rooko
-");
+"
+				);
 			}
 		}
 		

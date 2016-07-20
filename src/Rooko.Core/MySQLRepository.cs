@@ -14,54 +14,48 @@ namespace Rooko.Core
 	// migrate "..\src\Rooko.Tests\bin\Debug\Rooko.Tests.dll" "server=localhost;user id=root;database=test" "MySql.Data.MySqlClient"
 	public class BaseMySQLRepository
 	{
-		protected MySqlConnection connection;
+		protected MySqlConnection con;
 		
 		public BaseMySQLRepository(string connectionString)
 		{
-			connection = new MySqlConnection(connectionString);
+			con = new MySqlConnection(connectionString);
 		}
 		
-		public void ExecuteNonQuery(string query, params MySqlParameter[] parameters)
+		void OpenConnection()
 		{
-			try {
-				OpenConnection();
-				MySqlCommand cmd = new MySqlCommand(query, connection);
-				foreach (var p in parameters) {
-					cmd.Parameters.Add(p);
-				}
-				cmd.ExecuteNonQuery();
-			} catch {
-				throw;
-			} finally {
-				CloseConnection();
+			if (con.State == ConnectionState.Closed) {
+				con.Open();
 			}
 		}
 		
-		protected void OpenConnection()
+		void CloseConnection()
 		{
-			if (connection.State == ConnectionState.Closed) {
-				connection.Open();
-			}
-		}
-		
-		protected void CloseConnection()
-		{
-			if (connection.State == ConnectionState.Open) {
-				connection.Close();
+			if (con.State == ConnectionState.Open) {
+				con.Close();
 			}
 		}
 		
 		public MySqlDataReader ExecuteReader(string query, params MySqlParameter[] parameters)
 		{
+			var cmd = new MySqlCommand(query, con);
+			foreach (var p in parameters) {
+				cmd.Parameters.Add(p);
+			}
+			OpenConnection();
+			return cmd.ExecuteReader();
+		}
+		
+		public void ExecuteNonQuery(string query, params MySqlParameter[] parameters)
+		{
 			try {
-				OpenConnection();
-				var cmd = new MySqlCommand(query, connection);
+				var cmd = new MySqlCommand(query, con);
 				foreach (var p in parameters) {
 					cmd.Parameters.Add(p);
 				}
-				return cmd.ExecuteReader();
+				OpenConnection();
+				cmd.ExecuteNonQuery();
 			} catch {
-				throw;
+				
 			} finally {
 				CloseConnection();
 			}
@@ -74,6 +68,17 @@ namespace Rooko.Core
 		
 		public MySQLMigrationRepository(string connectionString) : base(connectionString)
 		{
+		}
+		
+		public bool SchemaExists()
+		{
+			string query = "select 1 from information_schema.tables where table_name = 'schema_migrations'";
+			using (var r = ExecuteReader(query)) {
+				if (r.Read()) {
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		public bool VersionExists(string version)
@@ -111,17 +116,6 @@ namespace Rooko.Core
 			ExecuteNonQuery(query);
 		}
 		
-		public bool SchemaExists()
-		{
-			string query = "select 1 from information_schema.tables where table_name = 'schema_migrations'";
-			using (var r = ExecuteReader(query)) {
-				if (r.Read()) {
-					return true;
-				}
-			}
-			return false;
-		}
-		
 		public void CreateTable(Table table)
 		{
 			ExecuteNonQuery(f.GetCreateTable(table));
@@ -149,12 +143,30 @@ namespace Rooko.Core
 		
 		public void Insert(string tableName, ICollection<KeyValuePair<string, object>> values)
 		{
-			throw new NotImplementedException();
+			string cols = "", vals = "";
+			int i = 0;
+			foreach (var c in values) {
+				cols += c.Key;
+				vals += "'" + c.Value + "'";
+				cols += i < values.Count - 1 ? ", " : "";
+				vals += i < values.Count - 1 ? ", " : "";
+				i++;
+			}
+			string query = string.Format("insert into {0}({1}) values({2})", tableName, cols, vals);
+			ExecuteNonQuery(query);
 		}
 		
 		public void Delete(string tableName, ICollection<KeyValuePair<string, object>> where)
 		{
-			throw new NotImplementedException();
+			string wher = "";
+			int i = 0;
+			foreach (var w in where) {
+				wher += w.Key + " = '" + w.Value + "'";
+				wher += i < where.Count - 1 ? " and" : "";
+				i++;
+			}
+			string query = string.Format("delete from {0} where {1}", tableName, where);
+			ExecuteNonQuery(query);
 		}
 		
 		public void Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> where)
