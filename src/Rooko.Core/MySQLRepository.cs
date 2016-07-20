@@ -4,15 +4,16 @@
 //	</file>
 
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using MySql.Data.MySqlClient;
 
 namespace Rooko.Core
 {
+	// migrate "..\src\Rooko.Tests\bin\Debug\Rooko.Tests.dll" "server=localhost;user id=root;database=test" "MySql.Data.MySqlClient"
 	public class BaseMySQLRepository
 	{
-//		protected MySqlConnection connection = new MySqlConnection(ConfigurationManager.ConnectionStrings["test"].ConnectionString);
 		protected MySqlConnection connection;
 		
 		public BaseMySQLRepository(string connectionString)
@@ -20,12 +21,14 @@ namespace Rooko.Core
 			connection = new MySqlConnection(connectionString);
 		}
 		
-		public void ExecuteNonQuery(string query, params MySqlParameter[] paramz)
+		public void ExecuteNonQuery(string query, params MySqlParameter[] parameters)
 		{
 			try {
 				OpenConnection();
 				MySqlCommand cmd = new MySqlCommand(query, connection);
-				cmd.Parameters.AddRange(paramz);
+				foreach (var p in parameters) {
+					cmd.Parameters.Add(p);
+				}
 				cmd.ExecuteNonQuery();
 			} catch {
 				throw;
@@ -48,12 +51,14 @@ namespace Rooko.Core
 			}
 		}
 		
-		public MySqlDataReader ExecuteReader(string query, params MySqlParameter[] paramz)
+		public MySqlDataReader ExecuteReader(string query, params MySqlParameter[] parameters)
 		{
 			try {
 				OpenConnection();
 				var cmd = new MySqlCommand(query, connection);
-				cmd.Parameters.AddRange(paramz);
+				foreach (var p in parameters) {
+					cmd.Parameters.Add(p);
+				}
 				return cmd.ExecuteReader();
 			} catch {
 				throw;
@@ -108,7 +113,13 @@ namespace Rooko.Core
 		
 		public bool SchemaExists()
 		{
-			throw new NotImplementedException();
+			string query = "select 1 from information_schema.tables where table_name = 'schema_migrations'";
+			using (var r = ExecuteReader(query)) {
+				if (r.Read()) {
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		public void CreateTable(Table table)
@@ -136,12 +147,17 @@ namespace Rooko.Core
 			ExecuteNonQuery(query);
 		}
 		
-		public void Insert(string tableName, params Column[] columns)
+		public void Insert(string tableName, ICollection<KeyValuePair<string, object>> values)
 		{
 			throw new NotImplementedException();
 		}
 		
-		public void Delete(string tableName, params Column[] columns)
+		public void Delete(string tableName, ICollection<KeyValuePair<string, object>> where)
+		{
+			throw new NotImplementedException();
+		}
+		
+		public void Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> where)
 		{
 			throw new NotImplementedException();
 		}

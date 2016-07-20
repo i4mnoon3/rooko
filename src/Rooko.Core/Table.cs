@@ -29,11 +29,11 @@ namespace Rooko.Core
 		
 		void RemoveColumns(string tableName, params string[] columns);
 		
-		void Insert(string tableName, params Column[] columns);
+		void Insert(string tableName, ICollection<KeyValuePair<string, object>> values);
 		
-		void Delete(string tableName, params Column[] columns);
+		void Delete(string tableName, ICollection<KeyValuePair<string, object>> where);
 		
-//		void Update(string tableName);
+		void Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> where);
 	}
 	
 	public class BaseMigrationRepository
@@ -150,12 +150,17 @@ namespace Rooko.Core
 			ExecuteNonQuery(f.GetDropColumn(tableName, columns));
 		}
 		
-		public void Insert(string tableName, params Column[] columns)
+		public void Insert(string tableName, ICollection<KeyValuePair<string, object>> vals)
 		{
 			throw new NotImplementedException();
 		}
 		
-		public void Delete(string tableName, params Column[] columns)
+		public void Delete(string tableName, ICollection<KeyValuePair<string, object>> where)
+		{
+			throw new NotImplementedException();
+		}
+		
+		public void Update(string tableName, ICollection<KeyValuePair<string, object>> vals, ICollection<KeyValuePair<string, object>> where)
 		{
 			throw new NotImplementedException();
 		}

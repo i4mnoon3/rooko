@@ -4,6 +4,7 @@
 //	</file>
 
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -11,6 +12,7 @@ using System.Data.SQLite;
 
 namespace Rooko.Core
 {
+	// migrate "..\src\Rooko.Tests\bin\Debug\Rooko.Tests.dll" "data source=db.sqlite" "System.Data.SQLite"
 	public class BaseSQLiteRepository
 	{
 		protected SQLiteConnection connection;
@@ -61,13 +63,9 @@ namespace Rooko.Core
 		}
 	}
 	
-	public class SQLiteMigrationRepository : BaseSQLiteRepository, IMigrationRepository // SQLiteTableRepository, IMigrationRepository
+	public class SQLiteMigrationRepository : BaseSQLiteRepository, IMigrationRepository
 	{
 		SQLiteMigrationFormatter f = new SQLiteMigrationFormatter();
-		
-//		public SQLiteMigrationRepository() : base()
-//		{
-//		}
 		
 		public SQLiteMigrationRepository(string connectionString) : base(connectionString)
 		{
@@ -166,13 +164,18 @@ namespace Rooko.Core
 			ExecuteNonQuery(query);
 		}
 		
-		public void Insert(string tableName, params Column[] columns)
+		public void Insert(string tableName, ICollection<KeyValuePair<string, object>> values)
 		{
 			string query = string.Format(@"");
 			ExecuteNonQuery(query);
 		}
 		
-		public void Delete(string tableName, params Column[] columns)
+		public void Delete(string tableName, ICollection<KeyValuePair<string, object>> where)
+		{
+			throw new NotImplementedException();
+		}
+		
+		public void Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> where)
 		{
 			throw new NotImplementedException();
 		}

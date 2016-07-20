@@ -4,6 +4,7 @@
 //	</file>
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Rooko.Core;
 
@@ -105,8 +106,10 @@ namespace Rooko.Tests
 		{
 			Insert(
 				"users",
-				new Column { Name = "username", Value = "root" },
-				new Column { Name = "password", Value = "password" }
+				new [] {
+					new KeyValuePair<string, object>("username", "admin"),
+					new KeyValuePair<string, object>("password", "root")
+				}
 			);
 		}
 		
@@ -114,8 +117,10 @@ namespace Rooko.Tests
 		{
 			Delete(
 				"users",
-				new Column { Name = "username", Value = "root" },
-				new Column { Name = "password", Value = "password" }
+				new [] {
+					new KeyValuePair<string, object>("username", "admin"),
+					new KeyValuePair<string, object>("password", "root")
+				}
 			);
 		}
 	}

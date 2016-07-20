@@ -4,11 +4,14 @@
 //	</file>
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace Rooko.Core
 {
+	// migrate "..\src\Rooko.Tests\bin\Debug\Rooko.Tests.dll" "Server=.;Database=test;Trusted_Connection=True;" "System.Data.SqlClient"
 	public class BaseSqlRepository
 	{
 		SqlConnection connection;
@@ -130,31 +133,50 @@ namespace Rooko.Core
 			ExecuteNonQuery(f.GetDropColumn(tableName, columns));
 		}
 		
-		public void Insert(string tableName, params Column[] columns)
+		public void Insert(string tableName, ICollection<KeyValuePair<string, object>> values)
 		{
 			string cols = "", vals = "";
 			int i = 0;
-			foreach (var c in columns) {
-				cols += c.Name;
+			foreach (var c in values) {
+				cols += c.Key;
 				vals += "'" + c.Value + "'";
-				cols += i < columns.Length - 1 ? ", " : "";
-				vals += i < columns.Length - 1 ? ", " : "";
+				cols += i < values.Count - 1 ? ", " : "";
+				vals += i < values.Count - 1 ? ", " : "";
 				i++;
 			}
 			string query = string.Format("insert into {0}({1}) values({2})", tableName, cols, vals);
 			ExecuteNonQuery(query);
 		}
 		
-		public void Delete(string tableName, params Column[] columns)
+		public void Delete(string tableName, ICollection<KeyValuePair<string, object>> where)
 		{
-			string where = "";
+			string wher = "";
 			int i = 0;
-			foreach (var c in columns) {
-				where += c.Name + " = '" + c.Value + "'";
-				where += i < columns.Length - 1 ? " and" : "";
+			foreach (var w in where) {
+				wher += w.Key + " = '" + w.Value + "'";
+				wher += i < where.Count - 1 ? " and" : "";
 				i++;
 			}
 			string query = string.Format("delete from {0} where {1}", tableName, where);
+			ExecuteNonQuery(query);
+		}
+		
+		public void Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> where)
+		{
+			string vals = "", wher = "";
+			int i = 0;
+			foreach (var v in values) {
+				vals += v.Key + " = '" + v.Value + "'";
+				vals += i < values.Count - 1 ? ", " : "";
+				i++;
+			}
+			i = 0;
+			foreach (var w in where) {
+				wher += w.Key + " = '" + w.Value + "'";
+				wher += i < where.Count - 1 ? " and" : "";
+				i++;
+			}
+			string query = string.Format("update {0} set {1} where {2}", tableName, vals, where);
 			ExecuteNonQuery(query);
 		}
 	}

@@ -117,16 +117,16 @@ namespace Rooko.Core
 			}
 		}
 		
-		public void Insert(string tableName, params Column[] columns)
+		public void Insert(string tableName, ICollection<KeyValuePair<string, object>> values)
 		{
 			if (!Repository.VersionExists(Version)) {
 				OnMigrating(new MigrationEventArgs(""));
-				Repository.Insert(tableName, columns);
+				Repository.Insert(tableName, values);
 				Repository.Save(this);
 			}
 		}
 		
-		public void Delete(string tableName, params Column[] columns)
+		public void Delete(string tableName, ICollection<KeyValuePair<string, object>> where)
 		{
 			throw new NotImplementedException();
 		}
