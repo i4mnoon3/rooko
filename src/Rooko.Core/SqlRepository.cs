@@ -14,15 +14,20 @@ namespace Rooko.Core
 	// Example: migrate "..\src\Rooko.Tests\bin\Debug\Rooko.Tests.dll" "Server=.;Database=test;Trusted_Connection=True;" "System.Data.SqlClient"
 	public class SqlMigrationFormatter : IMigrationFormatter
 	{
-		SqlConnection connection;
+//		SqlConnection connection;
+		string connectionString;
+		string database;
 		
 		public SqlMigrationFormatter(string connectionString)
 		{
-			this.connection = new SqlConnection(connectionString);
+//			this.connection = new SqlConnection(connectionString);
+			this.connectionString = connectionString;
 		}
 		
 		public IDbConnection CreateConnection()
 		{
+			var connection = new SqlConnection(connectionString);
+			this.database = connection.Database;
 			return connection;
 		}
 		
@@ -104,19 +109,44 @@ namespace Rooko.Core
 			return string.Format("delete from {0} {1}", tableName, @where);
 		}
 		
-		public string GetInsert(string tableName, ICollection<KeyValuePair<string, object>> vals)
+		public string GetInsert(string tableName, ICollection<KeyValuePair<string, object>> values)
 		{
-			throw new NotImplementedException();
+			string cols = "", vals = "";
+			int i = 1;
+			foreach (var v in values) {
+				cols += v.Key;
+				vals += "'" + v.Value + "'";
+				cols += i < values.Count ? ", " : "";
+				vals += i < values.Count ? ", " : "";
+				i++;
+			}
+			return string.Format("insert into {0}({1}) values({2})", tableName, cols, vals);
 		}
 		
 		public string GetDelete(string tableName, ICollection<KeyValuePair<string, object>> @where)
 		{
-			throw new NotImplementedException();
+			string wher = "";
+			int i = 1;
+			foreach (var w in @where) {
+				wher += w.Key + " = '" + w.Value + "'";
+				wher += i++ < @where.Count ? " and " : "";
+			}
+			return string.Format("delete from {0} where {1}", tableName, wher);
 		}
 		
-		public string GetUpdate(string tableName, ICollection<KeyValuePair<string, object>> vals, ICollection<KeyValuePair<string, object>> @where)
+		public string GetUpdate(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> @where)
 		{
-			throw new NotImplementedException();
+			string vals = "", wher = "";
+			int i = 1;
+			foreach (var v in values) {
+				vals += v.Key + " = '" + v.Value + "'";
+				vals += i++ < values.Count ? " and " : ""; 
+			}
+			foreach (var w in @where) {
+				wher += w.Key + " = '" + w.Value + "'";
+				wher += i++ < @where.Count ? " and " : "";
+			}
+			return string.Format("update {0} set {1} where {2}", tableName, vals, wher);
 		}
 		
 		public string GetCreateSchema()
@@ -126,7 +156,7 @@ namespace Rooko.Core
 		
 		public string GetCheckSchema()
 		{
-			throw new NotImplementedException();
+			return string.Format("select 1 from {0}.information_schema.tables where table_name = 'schema_migrations'", database);
 		}
 	}
 }

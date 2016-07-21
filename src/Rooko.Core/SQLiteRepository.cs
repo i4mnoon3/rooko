@@ -15,15 +15,18 @@ namespace Rooko.Core
 	// Example: migrate "..\src\Rooko.Tests\bin\Debug\Rooko.Tests.dll" "data source=db.sqlite" "System.Data.SQLite"
 	public class SQLiteMigrationFormatter : IMigrationFormatter
 	{
-		SQLiteConnection connection;
+		string database;
+		string connectionString;
 		
 		public SQLiteMigrationFormatter(string connectionString)
 		{
-			this.connection = new SQLiteConnection(connectionString);
+			this.connectionString = connectionString;
 		}
 		
 		public IDbConnection CreateConnection()
 		{
+			var connection = new SQLiteConnection(connectionString);
+			database = connection.Database;
 			return connection;
 		}
 		
@@ -49,11 +52,11 @@ namespace Rooko.Core
 		public string GetAddColumn(string tableName, params Column[] columns)
 		{
 			string cols = "";
-			int i = 0;
+			int i = 1;
 			foreach (var c in columns) {
 				cols += string.Format("alter table {0} add {1} {2}", tableName, c.Name, c.Type);
-				if (i++ < columns.Length - 1) {
-					cols += ";" + Environment.NewLine;
+				if (i++ < columns.Length) {
+					cols += Environment.NewLine;
 				}
 			}
 			return cols;
@@ -81,19 +84,44 @@ namespace Rooko.Core
 			return cols;
 		}
 		
-		public string GetInsert(string tableName, ICollection<KeyValuePair<string, object>> vals)
+		public string GetInsert(string tableName, ICollection<KeyValuePair<string, object>> values)
 		{
-			throw new NotImplementedException();
+			string cols = "", vals = "";
+			int i = 1;
+			foreach (var v in values) {
+				cols += v.Key;
+				vals += "'" + v.Value + "'";
+				cols += i < values.Count ? ", " : "";
+				vals += i < values.Count ? ", " : "";
+				i++;
+			}
+			return string.Format("insert into {0}({1}) values({2})", tableName, cols, vals);
 		}
 		
 		public string GetDelete(string tableName, ICollection<KeyValuePair<string, object>> @where)
 		{
-			throw new NotImplementedException();
+			string wher = "";
+			int i = 1;
+			foreach (var w in @where) {
+				wher += w.Key + " = '" + w.Value + "'";
+				wher += i++ < @where.Count ? " and " : "";
+			}
+			return string.Format("delete from {0} where {1}", tableName, wher);
 		}
 		
-		public string GetUpdate(string tableName, ICollection<KeyValuePair<string, object>> vals, ICollection<KeyValuePair<string, object>> @where)
+		public string GetUpdate(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> @where)
 		{
-			throw new NotImplementedException();
+			string vals = "", wher = "";
+			int i = 1;
+			foreach (var v in values) {
+				vals += v.Key + " = '" + v.Value + "'";
+				vals += i++ < values.Count ? " and " : ""; 
+			}
+			foreach (var w in @where) {
+				wher += w.Key + " = '" + w.Value + "'";
+				wher += i++ < @where.Count ? " and " : "";
+			}
+			return string.Format("update {0} set {1} where {2}", tableName, vals, wher);
 		}
 		
 		public string GetCreateSchema()
@@ -103,7 +131,7 @@ namespace Rooko.Core
 		
 		public string GetCheckSchema()
 		{
-			throw new NotImplementedException();
+			return string.Format("select 1 from sqlite_master where tbl_name = 'schema_migrations'");
 		}
 	}
 }
