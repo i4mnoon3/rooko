@@ -6,3 +6,6 @@
 /src/Rooko/obj
 *.nupkg
 /src/packages
+src/Rooko.v11.suo
+src/Rooko.Core/StyleCop.Cache
+src/Rooko.Core/StyleCopViolations.xml
