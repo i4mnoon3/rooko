@@ -97,16 +97,6 @@ namespace Rooko.Core
 			return m;
 		}
 		
-		public bool SchemaExists()
-		{
-			using (var r = ExecuteReader(f.GetCheckSchema())) {
-				if (r.Read()) {
-					return true;
-				}
-			}
-			return false;
-		}
-		
 		public void Save(Migration migration)
 		{
 			string query = string.Format("insert into schema_migrations(version) values('{0}')", migration.Version);
@@ -117,6 +107,21 @@ namespace Rooko.Core
 		{
 			string query = string.Format("delete from schema_migrations where version = '{0}'", migration.Version);
 			ExecuteNonQuery(query);
+		}
+		
+		public void BuildSchema()
+		{
+			ExecuteNonQuery(f.GetCreateSchema());
+		}
+		
+		public bool SchemaExists()
+		{
+			using (var r = ExecuteReader(f.GetCheckSchema())) {
+				if (r.Read()) {
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		public void CreateTable(Table table)
@@ -174,6 +179,39 @@ namespace Rooko.Core
 		string GetUpdate(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> where);
 		
 		string GetCheckSchema();
+		
+		string GetCreateSchema();
+	}
+	
+	public class TableEventArgs : EventArgs
+	{
+		public Table Table { get; set; }
+		
+		public ICollection<KeyValuePair<string, object>> Values { get; set; }
+		
+		public ICollection<KeyValuePair<string, object>> Where { get; set; }
+		
+		public TableEventArgs(string tableName) : this(new Table(tableName))
+		{
+		}
+		
+		public TableEventArgs(Table table)
+		{
+			this.Table = table;
+		}
+		
+		public TableEventArgs(Table table, ICollection<KeyValuePair<string, object>> values)
+		{
+			this.Table = table;
+			this.Values = values;
+		}
+		
+		public TableEventArgs(Table table, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> @where)
+		{
+			this.Table = table;
+			this.Values = values;
+			this.Where = @where;
+		}
 	}
 	
 	public class Table
@@ -182,6 +220,16 @@ namespace Rooko.Core
 		{
 			this.Name = name;
 			this.Columns = new List<Column>(columns);
+		}
+		
+		public List<string> ColumnNames {
+			get {
+				var columns = new List<string>();
+				foreach (var c in Columns) {
+					columns.Add(c.Name);
+				}
+				return columns;
+			}
 		}
 		
 		public void AddColumn(string name)
@@ -250,5 +298,10 @@ namespace Rooko.Core
 		public bool AutoIncrement { get; set; }
 		
 		public object Value { get; set; }
+		
+		public override string ToString()
+		{
+			return Name;
+		}
 	}
 }

@@ -38,8 +38,7 @@ namespace Rooko.Core
 				cols += i++ < table.Columns.Count - 1 ? "," : "";
 				cols += Environment.NewLine;
 			}
-			return string.Format(@"create table {0}(
-{1});", table.Name, cols);
+			return string.Format(@"create table {0}({1});", table.Name, cols);
 		}
 		
 		public string GetDropTable(string tableName)
@@ -58,6 +57,15 @@ namespace Rooko.Core
 				}
 			}
 			return cols;
+		}
+		
+		public string GetAddColumn(string tableName, params string[] columns)
+		{
+			var cols = new List<Column>();
+			foreach (var c in columns) {
+				cols.Add(new Column(c));
+			}
+			return GetAddColumn(tableName, cols.ToArray());
 		}
 		
 		public string GetDropColumn(string tableName, params string[] columns)
@@ -86,6 +94,11 @@ namespace Rooko.Core
 		public string GetUpdate(string tableName, ICollection<KeyValuePair<string, object>> vals, ICollection<KeyValuePair<string, object>> @where)
 		{
 			throw new NotImplementedException();
+		}
+		
+		public string GetCreateSchema()
+		{
+			return string.Format("create table schema_migrations(id integer not null primary key, version varchar(255))");
 		}
 		
 		public string GetCheckSchema()

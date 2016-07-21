@@ -29,6 +29,11 @@ namespace Rooko.Core
 			return connection;
 		}
 		
+		public string GetCreateSchema()
+		{
+			return string.Format("create table schema_migrations(id integer not null primary key auto_increment, version varchar(255))");
+		}
+		
 		public string GetCheckSchema()
 		{
 			return string.Format("select 1 from information_schema.tables where table_name = 'schema_migrations' and table_schema = '{0}'", database);

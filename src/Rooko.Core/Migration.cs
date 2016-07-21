@@ -31,15 +31,56 @@ namespace Rooko.Core
 			this.Version = version;
 		}
 		
+		public event EventHandler<TableEventArgs> Inserting;
+		
+		public event EventHandler<TableEventArgs> TableCreate;
+		
+		public event EventHandler<TableEventArgs> TableDrop;
+		
+		public event EventHandler<TableEventArgs> ColumnAdd;
+		
+		public event EventHandler<TableEventArgs> ColumnRemove;
+		
+		public event EventHandler<TableEventArgs> Deleting;
+		
 		public event EventHandler<MigrationEventArgs> Migrating;
 		
 		public string Version { get; set; }
 		
-		public MigrationRepository Repository { get; set; }
-		
 		public abstract void Migrate();
 		
 		public abstract void Rollback();
+		
+		public void RemoveColumn(string tableName, params string[] columns)
+		{
+			string cols = "";
+			int i = 1;
+			foreach (var c in columns) {
+				cols += c;
+				if (i++ < columns.Length) {
+					cols += ", ";
+				}
+			}
+			OnMigrating(new MigrationEventArgs(string.Format("Removing {0} from {1}...", cols, tableName)));
+			
+			var t = new Table(tableName);
+			foreach (var c in columns) {
+				t.AddColumn(c);
+			}
+			OnColumnRemove(new TableEventArgs(t));
+		}
+		
+		public void Insert(string tableName, ICollection<KeyValuePair<string, object>> values)
+		{
+			OnMigrating(new MigrationEventArgs(string.Format("Inserting values to {0}...", tableName)));
+			OnInserting(new TableEventArgs(new Table(tableName), values));
+		}
+		
+		public void Delete(string tableName, ICollection<KeyValuePair<string, object>> @where)
+		{
+			OnMigrating(new MigrationEventArgs(string.Format("Deleting values from {0}...", tableName)));
+			OnDeleting(new TableEventArgs(new Table(tableName), null, @where));
+		}
 		
 		protected virtual void OnMigrating(MigrationEventArgs e)
 		{
@@ -53,42 +94,16 @@ namespace Rooko.Core
 			CreateTable(new Table(tableName, columns));
 		}
 		
-		public bool SchemaExists()
-		{
-			return Repository.SchemaExists();
-		}
-		
-		public bool Exists()
-		{
-			return Repository.VersionExists(Version);
-		}
-		
-		public void BuildSchema()
-		{
-			OnMigrating(new MigrationEventArgs("No schema found. Building schema_migrations..."));
-			Repository.CreateTable(new Table("schema_migrations", new Column("id", "integer", true, true, true), new Column("version")));
-		}
-		
 		protected void CreateTable(Table table)
 		{
 			OnMigrating(new MigrationEventArgs(string.Format("Creating table {0}...", table.Name)));
-			Repository.CreateTable(table);
+			OnTableCreate(new TableEventArgs(table));
 		}
 		
 		protected void DropTable(string tableName)
 		{
 			OnMigrating(new MigrationEventArgs(string.Format("Dropping table {0}...", tableName)));
-			Repository.DropTable(tableName);
-		}
-		
-		public void Save()
-		{
-			Repository.Save(this);
-		}
-		
-		public void DeleteMigration()
-		{
-			Repository.Delete(this);
+			OnTableDrop(new TableEventArgs(tableName));
 		}
 		
 		protected void AddColumn(string tableName, params Column[] columns)
@@ -102,33 +117,49 @@ namespace Rooko.Core
 				}
 			}
 			OnMigrating(new MigrationEventArgs(string.Format("Adding {0} to {1}...", cols, tableName)));
-			Repository.AddColumns(tableName, columns);
+			OnColumnAdd(new TableEventArgs(new Table(tableName, columns)));
 		}
 		
-		public void RemoveColumn(string tableName, params string[] columns)
+		protected virtual void OnDeleting(TableEventArgs e)
 		{
-			string cols = "";
-			int i = 1;
-			foreach (var c in columns) {
-				cols += c;
-				if (i++ < columns.Length) {
-					cols += ", ";
-				}
+			if (Deleting != null) {
+				Deleting(this, e);
 			}
-			OnMigrating(new MigrationEventArgs(string.Format("Removing {0} from {1}...", cols, tableName)));
-			Repository.RemoveColumns(tableName, columns);
 		}
 		
-		public void Insert(string tableName, ICollection<KeyValuePair<string, object>> values)
+		protected virtual void OnColumnRemove(TableEventArgs e)
 		{
-			OnMigrating(new MigrationEventArgs(string.Format("Inserting values to {0}...", tableName)));
-			Repository.Insert(tableName, values);
+			if (ColumnRemove != null) {
+				ColumnRemove(this, e);
+			}
 		}
 		
-		public void Delete(string tableName, ICollection<KeyValuePair<string, object>> @where)
+		protected virtual void OnColumnAdd(TableEventArgs e)
 		{
-			OnMigrating(new MigrationEventArgs(string.Format("Deleting values from {0}...", tableName)));
-			Repository.Delete(tableName, @where);
+			if (ColumnAdd != null) {
+				ColumnAdd(this, e);
+			}
+		}
+		
+		protected virtual void OnTableDrop(TableEventArgs e)
+		{
+			if (TableDrop != null) {
+				TableDrop(this, e);
+			}
+		}
+		
+		protected virtual void OnTableCreate(TableEventArgs e)
+		{
+			if (TableCreate != null) {
+				TableCreate(this, e);
+			}
+		}
+		
+		protected virtual void OnInserting(TableEventArgs e)
+		{
+			if (Inserting != null) {
+				Inserting(this, e);
+			}
 		}
 	}
 }

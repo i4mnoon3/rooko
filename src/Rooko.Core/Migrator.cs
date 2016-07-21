@@ -23,7 +23,8 @@ namespace Rooko.Core
 			this.migrations = new List<Migration>();
 			foreach (var t in assembly.GetTypes()) {
 				if (t != typeof(Migration) && typeof(Migration).IsAssignableFrom(t)) {
-					migrations.Add((Migration)assembly.CreateInstance(t.ToString()));
+					var m = (Migration)assembly.CreateInstance(t.ToString());
+					migrations.Add(m);
 				}
 			}
 		}
@@ -35,18 +36,32 @@ namespace Rooko.Core
 			foreach (var m in migrations) {
 				try {
 					m.Migrating += new EventHandler<MigrationEventArgs>(MigrationMigrating);
-					m.Repository = repository;
-					if (!m.SchemaExists()) {
-						m.BuildSchema();
+					
+					m.TableCreate += new EventHandler<TableEventArgs>(MigrationTableCreate);
+					m.TableDrop += new EventHandler<TableEventArgs>(MigrationTableDrop);
+					m.ColumnAdd += new EventHandler<TableEventArgs>(MigrationColumnAdd);
+					m.ColumnRemove += new EventHandler<TableEventArgs>(MigrationColumnRemove);
+					m.Inserting += new EventHandler<TableEventArgs>(MigrationInserting);
+					m.Deleting += new EventHandler<TableEventArgs>(MigrationDeleting);
+					
+					if (!repository.SchemaExists()) {
+						repository.BuildSchema();
 					}
-					if (!m.Exists()) {
+					if (!repository.VersionExists(m.Version)) {
 						m.Migrate();
-						m.Save();
+						repository.Save(m);
 					}
 				} catch (Exception ex) {
 					Console.WriteLine("Error: " + ex.Message);
 				} finally {
 					m.Migrating -= new EventHandler<MigrationEventArgs>(MigrationMigrating);
+					
+					m.TableCreate -= new EventHandler<TableEventArgs>(MigrationTableCreate);
+					m.TableDrop -= new EventHandler<TableEventArgs>(MigrationTableDrop);
+					m.ColumnAdd -= new EventHandler<TableEventArgs>(MigrationColumnAdd);
+					m.ColumnRemove -= new EventHandler<TableEventArgs>(MigrationColumnRemove);
+					m.Inserting -= new EventHandler<TableEventArgs>(MigrationInserting);
+					m.Deleting -= new EventHandler<TableEventArgs>(MigrationDeleting);
 				}
 			}
 		}
@@ -59,9 +74,8 @@ namespace Rooko.Core
 					Migration m = migrations.Find(x => x.Version == latestVersion);
 					if (m != null) {
 						m.Migrating += new EventHandler<MigrationEventArgs>(MigrationMigrating);
-						m.Repository = repository;
 						m.Rollback();
-						m.DeleteMigration();
+						repository.Delete(m);
 					}
 				}
 			} catch (Exception ex) {
@@ -74,6 +88,36 @@ namespace Rooko.Core
 			if (Migrating != null) {
 				Migrating(this, e);
 			}
+		}
+
+		void MigrationDeleting(object sender, TableEventArgs e)
+		{
+			repository.Delete(e.Table.Name, e.Where);
+		}
+
+		void MigrationInserting(object sender, TableEventArgs e)
+		{
+			repository.Insert(e.Table.Name, e.Values);
+		}
+
+		void MigrationColumnRemove(object sender, TableEventArgs e)
+		{
+			repository.RemoveColumns(e.Table.Name, e.Table.ColumnNames.ToArray());
+		}
+
+		void MigrationColumnAdd(object sender, TableEventArgs e)
+		{
+			repository.AddColumns(e.Table.Name, e.Table.Columns.ToArray());
+		}
+
+		void MigrationTableDrop(object sender, TableEventArgs e)
+		{
+			repository.DropTable(e.Table.Name);
+		}
+
+		void MigrationTableCreate(object sender, TableEventArgs e)
+		{
+			repository.CreateTable(e.Table);
 		}
 
 		void MigrationMigrating(object sender, MigrationEventArgs e)
