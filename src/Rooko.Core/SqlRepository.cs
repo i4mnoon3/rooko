@@ -11,178 +11,21 @@ using System.Linq;
 
 namespace Rooko.Core
 {
-	// migrate "..\src\Rooko.Tests\bin\Debug\Rooko.Tests.dll" "Server=.;Database=test;Trusted_Connection=True;" "System.Data.SqlClient"
-	public class BaseSqlRepository
+	// Example: migrate "..\src\Rooko.Tests\bin\Debug\Rooko.Tests.dll" "Server=.;Database=test;Trusted_Connection=True;" "System.Data.SqlClient"
+	public class SqlMigrationFormatter : IMigrationFormatter
 	{
 		SqlConnection connection;
 		
-		public BaseSqlRepository(string connectionString)
+		public SqlMigrationFormatter(string connectionString)
 		{
-			connection = new SqlConnection(connectionString);
+			this.connection = new SqlConnection(connectionString);
 		}
 		
-		protected void OpenConnection()
+		public IDbConnection CreateConnection()
 		{
-			if (connection.State == ConnectionState.Closed) {
-				connection.Open();
-			}
+			return connection;
 		}
 		
-		protected void CloseConnection()
-		{
-			if (connection.State == ConnectionState.Open) {
-				connection.Close();
-			}
-		}
-		
-		protected void ExecuteNonQuery(string query, params SqlParameter[] parameters)
-		{
-			try {
-				OpenConnection();
-				var cmd = new SqlCommand(query, connection);
-				foreach (var p in parameters) {
-					cmd.Parameters.Add(p);
-				}
-				cmd.ExecuteNonQuery();
-			} catch {
-				throw;
-			} finally {
-				CloseConnection();
-			}
-		}
-		
-		protected SqlDataReader ExecuteReader(string query, params SqlParameter[] parameters)
-		{
-			try {
-				OpenConnection();
-				var cmd = new SqlCommand(query, connection);
-				foreach (var p in parameters) {
-					cmd.Parameters.Add(p);
-				}
-				return cmd.ExecuteReader();
-			} catch {
-				throw;
-			}
-		}
-	}
-	
-	public class SqlMigrationRepository : BaseSqlRepository, IMigrationRepository
-	{
-		SqlMigrationFormatter f = new SqlMigrationFormatter();
-		
-		public SqlMigrationRepository(string connectionString) : base(connectionString)
-		{
-		}
-		
-		public bool VersionExists(string version)
-		{
-			string query = string.Format("select version from schema_migrations where version = '{0}'", version);
-			using (var r = ExecuteReader(query)) {
-				if (r.Read()) {
-					return true;
-				}
-			}
-			return false;
-		}
-		
-		public Migration ReadLatest()
-		{
-			throw new NotImplementedException();
-		}
-		
-		public bool SchemaExists()
-		{
-			string query = "select 1 from information_schema.tables where table_name = 'schema_migrations'";
-			using (var r = ExecuteReader(query)) {
-				if (r.Read()) {
-					return true;
-				}
-			}
-			return false;
-		}
-		
-		public void Save(Migration migration)
-		{
-			string query = string.Format("insert into schema_migrations(version) values('{0}')", migration.Version);
-			ExecuteNonQuery(query);
-		}
-		
-		public void Delete(Migration migration)
-		{
-			string query = string.Format("delete from schema_migrations where version = '{0}'", migration.Version);
-			ExecuteNonQuery(query);
-		}
-		
-		public void CreateTable(Table table)
-		{
-			ExecuteNonQuery(f.GetCreateTable(table));
-		}
-		
-		public void DropTable(string tableName)
-		{
-			ExecuteNonQuery(f.GetDropTable(tableName));
-		}
-		
-		public void AddColumns(string tableName, params Column[] columns)
-		{
-			ExecuteNonQuery(f.GetAddColumn(tableName, columns));
-		}
-		
-		public void RemoveColumns(string tableName, params string[] columns)
-		{
-			ExecuteNonQuery(f.GetDropColumn(tableName, columns));
-		}
-		
-		public void Insert(string tableName, ICollection<KeyValuePair<string, object>> values)
-		{
-			string cols = "", vals = "";
-			int i = 0;
-			foreach (var c in values) {
-				cols += c.Key;
-				vals += "'" + c.Value + "'";
-				cols += i < values.Count - 1 ? ", " : "";
-				vals += i < values.Count - 1 ? ", " : "";
-				i++;
-			}
-			string query = string.Format("insert into {0}({1}) values({2})", tableName, cols, vals);
-			ExecuteNonQuery(query);
-		}
-		
-		public void Delete(string tableName, ICollection<KeyValuePair<string, object>> where)
-		{
-			string wher = "";
-			int i = 0;
-			foreach (var w in where) {
-				wher += w.Key + " = '" + w.Value + "'";
-				wher += i < where.Count - 1 ? " and" : "";
-				i++;
-			}
-			string query = string.Format("delete from {0} where {1}", tableName, where);
-			ExecuteNonQuery(query);
-		}
-		
-		public void Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> where)
-		{
-			string vals = "", wher = "";
-			int i = 0;
-			foreach (var v in values) {
-				vals += v.Key + " = '" + v.Value + "'";
-				vals += i < values.Count - 1 ? ", " : "";
-				i++;
-			}
-			i = 0;
-			foreach (var w in where) {
-				wher += w.Key + " = '" + w.Value + "'";
-				wher += i < where.Count - 1 ? " and" : "";
-				i++;
-			}
-			string query = string.Format("update {0} set {1} where {2}", tableName, vals, where);
-			ExecuteNonQuery(query);
-		}
-	}
-	
-	public class SqlMigrationFormatter : IMigrationFormatter
-	{
 		public string GetCreateTable(Table table)
 		{
 			string cols = "";
@@ -240,13 +83,36 @@ namespace Rooko.Core
 		
 		public string GetDelete(string tableName, params Column[] columns)
 		{
-			string where = "";
+			string @where = "";
 			int i = 0;
-			foreach (var c in columns) {
-				where += c.Name + " = '" + c.Value + "'";
-				where += i++ < columns.Length - 1 ? " and " : "";
+			if (columns.Length > 0) {
+				@where = " where ";
+				foreach (var c in columns) {
+					@where += c.Name + " = '" + c.Value + "'";
+					@where += i++ < columns.Length - 1 ? " and " : "";
+				}
 			}
-			return string.Format("delete from {0} where {1}", tableName, where);
+			return string.Format("delete from {0} {1}", tableName, @where);
+		}
+		
+		public string GetInsert(string tableName, ICollection<KeyValuePair<string, object>> vals)
+		{
+			throw new NotImplementedException();
+		}
+		
+		public string GetDelete(string tableName, ICollection<KeyValuePair<string, object>> @where)
+		{
+			throw new NotImplementedException();
+		}
+		
+		public string GetUpdate(string tableName, ICollection<KeyValuePair<string, object>> vals, ICollection<KeyValuePair<string, object>> @where)
+		{
+			throw new NotImplementedException();
+		}
+		
+		public string GetCheckSchema()
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

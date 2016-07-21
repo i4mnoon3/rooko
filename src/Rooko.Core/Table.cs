@@ -9,36 +9,14 @@ using System.Data;
 
 namespace Rooko.Core
 {
-	public interface IMigrationRepository
-	{
-		bool VersionExists(string version);
-		
-		Migration ReadLatest();
-		
-		bool SchemaExists();
-		
-		void Save(Migration migration);
-		
-		void Delete(Migration migration);
-		
-		void CreateTable(Table table);
-		
-		void DropTable(string tableName);
-		
-		void AddColumns(string tableName, params Column[] columns);
-		
-		void RemoveColumns(string tableName, params string[] columns);
-		
-		void Insert(string tableName, ICollection<KeyValuePair<string, object>> values);
-		
-		void Delete(string tableName, ICollection<KeyValuePair<string, object>> where);
-		
-		void Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> where);
-	}
-	
 	public class BaseMigrationRepository
 	{
 		IDbConnection connection;
+		
+		public BaseMigrationRepository(IDbConnection connection)
+		{
+			this.connection = connection;
+		}
 		
 		public void OpenConnection()
 		{
@@ -87,27 +65,33 @@ namespace Rooko.Core
 		}
 	}
 	
-	public class MigrationRepostory : BaseMigrationRepository, IMigrationRepository
+	public class MigrationRepository : BaseMigrationRepository
 	{
 		IMigrationFormatter f;
 		
-		public MigrationRepostory(IMigrationFormatter f)
+		public MigrationRepository(IMigrationFormatter f) : base(f.CreateConnection())
 		{
 			this.f = f;
 		}
 		
 		public bool VersionExists(string version)
 		{
-			throw new NotImplementedException();
+			string query = string.Format("select 1 from schema_migrations where version = '{0}'", version);
+			using (var r = ExecuteReader(query)) {
+				if (r.Read()) {
+					return true;
+				}
+			}
+			return false;
 		}
 		
-		public Migration ReadLatest()
+		public string ReadLatestVersion()
 		{
-			Migration m = null;
+			string m = null;
 			string query = string.Format("select version from schema_migrations order by id desc");
 			using (var r = ExecuteReader(query)) {
 				if (r.Read()) {
-					m = new Migration(r.GetString(0));
+					m = r.GetString(0);
 				}
 			}
 			return m;
@@ -115,7 +99,12 @@ namespace Rooko.Core
 		
 		public bool SchemaExists()
 		{
-			throw new NotImplementedException();
+			using (var r = ExecuteReader(f.GetCheckSchema())) {
+				if (r.Read()) {
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		public void Save(Migration migration)
@@ -152,22 +141,24 @@ namespace Rooko.Core
 		
 		public void Insert(string tableName, ICollection<KeyValuePair<string, object>> vals)
 		{
-			throw new NotImplementedException();
+			ExecuteNonQuery(f.GetInsert(tableName, vals));
 		}
 		
 		public void Delete(string tableName, ICollection<KeyValuePair<string, object>> where)
 		{
-			throw new NotImplementedException();
+			ExecuteNonQuery(f.GetDelete(tableName, where));
 		}
 		
 		public void Update(string tableName, ICollection<KeyValuePair<string, object>> vals, ICollection<KeyValuePair<string, object>> where)
 		{
-			throw new NotImplementedException();
+			ExecuteNonQuery(f.GetUpdate(tableName, vals, where));
 		}
 	}
 	
 	public interface IMigrationFormatter
 	{
+		IDbConnection CreateConnection();
+		
 		string GetCreateTable(Table table);
 		
 		string GetDropTable(string tableName);
@@ -175,6 +166,14 @@ namespace Rooko.Core
 		string GetAddColumn(string tableName, params Column[] columns);
 		
 		string GetDropColumn(string tableName, params string[] columns);
+		
+		string GetInsert(string tableName, ICollection<KeyValuePair<string, object>> values);
+		
+		string GetDelete(string tableName, ICollection<KeyValuePair<string, object>> where);
+		
+		string GetUpdate(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> where);
+		
+		string GetCheckSchema();
 	}
 	
 	public class Table

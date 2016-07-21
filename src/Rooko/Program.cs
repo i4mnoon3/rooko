@@ -16,30 +16,50 @@ namespace Rooko
 		private static void Main(string[] args)
 		{
 			if (args.Length == 4) {
-				string command = args[0], assembly = args[1], connectionString = args[2], providerName =  args[3];
-				var m = new Migrator(Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), assembly)), GetMigrationRepository(providerName, connectionString));
-				m.Migrating += delegate(object sender, MigrationEventArgs e) {
-					Console.WriteLine(e.Message);
-				};
-				if (command == "migrate") {
-					m.Migrate();
-				} else if (command == "rollback") {
-					m.Rollback();
-				} else {
-					throw new NotSupportedException();
-				}
-				#if DEBUG
-				Console.Write("Press any key to continue...");
-				Console.ReadLine();
-				#endif
+				MigrateRollback(args);
 			} else if (args.Length == 3) {
-				string command = args[0], subCommand = args[1], name = args[2];
-				if (command == "generate") {
-					if (subCommand == "migration") {
-						string fileName = string.Format("{1}{0}.cs", name, DateTime.Now.ToString("yyyyMMddHHmm"));
-						using (var s = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), fileName))) {
-							s.WriteLine(
-								@"using System;
+				Generate(args);
+			} else if (args.Length == 1 && args[0] == "-v") {
+				DisplayVersion();
+			} else {
+				DisplayHelp();
+			}
+		}
+		
+		static void MigrateRollback(string[] args)
+		{
+			string command = args[0], assembly = args[1], connectionString = args[2], providerName =  args[3];
+
+//			var m = new Migrator(Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), assembly)), GetMigrationRepository(providerName, connectionString));
+			var m = new Migrator(Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), assembly)), GetMigrationFormatter(providerName, connectionString));
+			m.Migrating += delegate(object sender, MigrationEventArgs e) {
+				Console.WriteLine(e.Message);
+			};
+			
+			if (command == "migrate") {
+				m.Migrate();
+			} else if (command == "rollback") {
+				m.Rollback();
+			} else {
+				throw new NotSupportedException();
+			}
+			
+			#if DEBUG
+//			Console.Write("Press any key to continue...");
+//			Console.ReadLine();
+			#endif
+		}
+		
+		static void Generate(string[] args)
+		{
+			string command = args[0], subCommand = args[1], name = args[2];
+			
+			if (command == "generate") {
+				if (subCommand == "migration") {
+					string fileName = string.Format("{1}{0}.cs", name, DateTime.Now.ToString("yyyyMMddHHmm"));
+					using (var s = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), fileName))) {
+						s.WriteLine(
+							@"using System;
 using Rooko.Core;
 
 namespace Migrations
@@ -61,17 +81,23 @@ namespace Migrations
 		}}
 	}}
 }}",
-								name,
-								Guid.NewGuid().ToString()
-							);
-						}
+							name,
+							Guid.NewGuid().ToString()
+						);
 					}
 				}
-			} else if (args.Length == 1 && args[0] == "-v") {
-				Console.WriteLine(Assembly.GetExecutingAssembly().GetName().Version);
-			} else {
-				Console.WriteLine(
-					@"Rooko is a simple database migration tool for .Net.
+			}
+		}
+		
+		static void DisplayVersion()
+		{
+			Console.WriteLine(Assembly.GetExecutingAssembly().GetName().Version);
+		}
+		
+		static void DisplayHelp()
+		{
+			Console.WriteLine(
+				@"Rooko is a simple database migration tool for .Net.
 
   Usage:
     rook -v
@@ -85,21 +111,33 @@ namespace Migrations
   Further Information:
     https://github.com/iescarro/rooko
 "
-				);
-			}
+			);
 		}
 		
-		static IMigrationRepository GetMigrationRepository(string providerName,string connectionString)
+		static IMigrationFormatter GetMigrationFormatter(string providerName,string connectionString)
 		{
-			if(providerName == "System.Data.SQLite") {
-				return new SQLiteMigrationRepository(connectionString);
-			} else if (providerName == "MySql.Data.MySqlClient"){
-				return new MySQLMigrationRepository(connectionString);
+			if (providerName == "System.Data.SQLite") {
+				return new SQLiteMigrationFormatter(connectionString);
+			} else if (providerName == "MySql.Data.MySqlClient") {
+				return new MySQLMigrationFormatter(connectionString);
 			} else if (providerName == "System.Data.SqlClient") {
-				return new SqlMigrationRepository(connectionString);
+				return new SqlMigrationFormatter(connectionString);
 			} else {
 				throw new NotSupportedException();
 			}
 		}
+		
+//		static IMigrationRepository GetMigrationRepository(string providerName,string connectionString)
+//		{
+//			if(providerName == "System.Data.SQLite") {
+//				return new SQLiteMigrationRepository(connectionString);
+//			} else if (providerName == "MySql.Data.MySqlClient"){
+//				return new MySQLMigrationRepository(connectionString);
+//			} else if (providerName == "System.Data.SqlClient") {
+//				return new SqlMigrationRepository(connectionString);
+//			} else {
+//				throw new NotSupportedException();
+//			}
+//		}
 	}
 }

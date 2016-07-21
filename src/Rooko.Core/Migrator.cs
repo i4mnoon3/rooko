@@ -14,12 +14,12 @@ namespace Rooko.Core
 {
 	public class Migrator
 	{
-		IMigrationRepository repository;
+		MigrationRepository repository;
 		List<Migration> migrations;
 		
-		public Migrator(Assembly assembly, IMigrationRepository repository)
+		public Migrator(Assembly assembly, IMigrationFormatter formatter)
 		{
-			this.repository = repository;
+			this.repository = new MigrationRepository(formatter);
 			this.migrations = new List<Migration>();
 			foreach (var t in assembly.GetTypes()) {
 				if (t != typeof(Migration) && typeof(Migration).IsAssignableFrom(t)) {
@@ -36,9 +36,15 @@ namespace Rooko.Core
 				try {
 					m.Migrating += new EventHandler<MigrationEventArgs>(MigrationMigrating);
 					m.Repository = repository;
-					m.Migrate();
-				} catch {
-					throw;
+					if (!m.SchemaExists()) {
+						m.BuildSchema();
+					}
+					if (!m.Exists()) {
+						m.Migrate();
+						m.Save();
+					}
+				} catch (Exception ex) {
+					Console.WriteLine("Error: " + ex.Message);
 				} finally {
 					m.Migrating -= new EventHandler<MigrationEventArgs>(MigrationMigrating);
 				}
@@ -47,11 +53,19 @@ namespace Rooko.Core
 		
 		public void Rollback()
 		{
-			Migration latest = repository.ReadLatest();
-			if (latest != null) {
-				Migration m = migrations.Find(x => x.Version == latest.Version);
-				m.Repository = repository;
-				m.Rollback();
+			try {
+				string latestVersion = repository.ReadLatestVersion();
+				if (latestVersion != null && latestVersion != "") {
+					Migration m = migrations.Find(x => x.Version == latestVersion);
+					if (m != null) {
+						m.Migrating += new EventHandler<MigrationEventArgs>(MigrationMigrating);
+						m.Repository = repository;
+						m.Rollback();
+						m.DeleteMigration();
+					}
+				}
+			} catch (Exception ex) {
+				Console.WriteLine("Error: " + ex.Message);
 			}
 		}
 		
