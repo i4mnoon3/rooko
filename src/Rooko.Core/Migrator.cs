@@ -43,6 +43,7 @@ namespace Rooko.Core
 					m.ColumnRemove += new EventHandler<TableEventArgs>(MigrationColumnRemove);
 					m.Inserting += new EventHandler<TableEventArgs>(MigrationInserting);
 					m.Deleting += new EventHandler<TableEventArgs>(MigrationDeleting);
+					m.Updating += new EventHandler<TableEventArgs>(MigrationUpdating);
 					
 					if (!repository.SchemaExists()) {
 						repository.BuildSchema();
@@ -62,8 +63,14 @@ namespace Rooko.Core
 					m.ColumnRemove -= new EventHandler<TableEventArgs>(MigrationColumnRemove);
 					m.Inserting -= new EventHandler<TableEventArgs>(MigrationInserting);
 					m.Deleting -= new EventHandler<TableEventArgs>(MigrationDeleting);
+					m.Updating -= new EventHandler<TableEventArgs>(MigrationUpdating);
 				}
 			}
+		}
+
+		void MigrationUpdating(object sender, TableEventArgs e)
+		{
+			repository.Update(e.Table.Name, e.Values, e.Where);
 		}
 		
 		public void Rollback()

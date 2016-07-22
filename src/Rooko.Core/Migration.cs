@@ -45,6 +45,15 @@ namespace Rooko.Core
 		
 		public event EventHandler<MigrationEventArgs> Migrating;
 		
+		public event EventHandler<TableEventArgs> Updating;
+		
+		protected virtual void OnUpdating(TableEventArgs e)
+		{
+			if (Updating != null) {
+				Updating(this, e);
+			}
+		}
+		
 		public string Version { get; set; }
 		
 		public abstract void Migrate();
@@ -80,6 +89,12 @@ namespace Rooko.Core
 		{
 			OnMigrating(new MigrationEventArgs(string.Format("Deleting values from {0}...", tableName)));
 			OnDeleting(new TableEventArgs(new Table(tableName), null, @where));
+		}
+		
+		public void Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> @where)
+		{
+			OnMigrating(new MigrationEventArgs(string.Format("Updating values to {0}...", tableName)));
+			OnUpdating(new TableEventArgs(new Table(tableName), values, @where));
 		}
 		
 		protected virtual void OnMigrating(MigrationEventArgs e)
