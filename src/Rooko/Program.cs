@@ -45,16 +45,11 @@ namespace Rooko
 			} else {
 				throw new NotSupportedException();
 			}
-			
-			#if DEBUG
-//			Console.Write("Press any key to continue...");
-//			Console.ReadLine();
-			#endif
 		}
 		
 		static void MigrateRollback2(string[] args)
 		{
-			string command = args[0], assembly = args[1]; //, connectionString = args[2], providerName =  args[3];
+			string command = args[0], assembly = args[1];
 
 			var a = Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), assembly));
 			var config = ConfigurationManager.OpenExeConfiguration(a.Location);
@@ -73,11 +68,6 @@ namespace Rooko
 			} else {
 				throw new NotSupportedException();
 			}
-			
-			#if DEBUG
-//			Console.Write("Press any key to continue...");
-//			Console.ReadLine();
-			#endif
 		}
 		
 		static void Generate(string[] args)
