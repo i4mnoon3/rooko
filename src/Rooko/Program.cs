@@ -4,6 +4,7 @@
 //	</file>
 
 using System;
+using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
@@ -17,6 +18,8 @@ namespace Rooko
 		{
 			if (args.Length == 4) {
 				MigrateRollback(args);
+			} else if (args.Length == 2) {
+				MigrateRollback2(args);
 			} else if (args.Length == 3) {
 				Generate(args);
 			} else if (args.Length == 1 && args[0] == "-v") {
@@ -30,8 +33,35 @@ namespace Rooko
 		{
 			string command = args[0], assembly = args[1], connectionString = args[2], providerName =  args[3];
 
-//			var m = new Migrator(Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), assembly)), GetMigrationRepository(providerName, connectionString));
 			var m = new Migrator(Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), assembly)), GetMigrationFormatter(providerName, connectionString));
+			m.Migrating += delegate(object sender, MigrationEventArgs e) {
+				Console.WriteLine(e.Message);
+			};
+			
+			if (command == "migrate") {
+				m.Migrate();
+			} else if (command == "rollback") {
+				m.Rollback();
+			} else {
+				throw new NotSupportedException();
+			}
+			
+			#if DEBUG
+//			Console.Write("Press any key to continue...");
+//			Console.ReadLine();
+			#endif
+		}
+		
+		static void MigrateRollback2(string[] args)
+		{
+			string command = args[0], assembly = args[1]; //, connectionString = args[2], providerName =  args[3];
+
+			var a = Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), assembly));
+			var config = ConfigurationManager.OpenExeConfiguration(a.Location);
+			var connection = config.ConnectionStrings.ConnectionStrings[config.AppSettings.Settings["database"].Value];
+			string connectionString = connection.ConnectionString;
+			string providerName = connection.ProviderName;
+			var m = new Migrator(a, GetMigrationFormatter(providerName, connectionString));
 			m.Migrating += delegate(object sender, MigrationEventArgs e) {
 				Console.WriteLine(e.Message);
 			};
