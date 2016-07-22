@@ -23,6 +23,5 @@ namespace Rooko.Tests
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new MainForm());
 		}
-		
 	}
 }

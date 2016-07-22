@@ -67,11 +67,6 @@ namespace Rooko.Core
 				}
 			}
 		}
-
-		void MigrationUpdating(object sender, TableEventArgs e)
-		{
-			repository.Update(e.Table.Name, e.Values, e.Where);
-		}
 		
 		public void Rollback()
 		{
@@ -95,6 +90,11 @@ namespace Rooko.Core
 			if (Migrating != null) {
 				Migrating(this, e);
 			}
+		}
+
+		void MigrationUpdating(object sender, TableEventArgs e)
+		{
+			repository.Update(e.Table.Name, e.Values, e.Where);
 		}
 
 		void MigrationDeleting(object sender, TableEventArgs e)

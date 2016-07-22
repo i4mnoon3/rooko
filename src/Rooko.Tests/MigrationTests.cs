@@ -23,15 +23,11 @@ namespace Rooko.Tests
 			m1.Migrating += delegate(object sender, MigrationEventArgs e) {
 				Console.WriteLine(e.Message);
 			};
-//			m1.Repository = new SQLiteMigrationRepository("data source=db.sqlite");
-//			m1.Repository = new MigrationRepository(new SQLiteMigrationFormatter("data source=db.sqlite"));
 			
 			m2 = new AddUsernameToUsers();
 			m2.Migrating += delegate(object sender, MigrationEventArgs e) {
 				Console.WriteLine(e.Message);
 			};
-//			m2.Repository = new SQLiteMigrationRepository("data source=db.sqlite");
-//			m2.Repository = new MigrationRepository(new SQLiteMigrationFormatter("data source=db.sqlite"));
 		}
 		
 		[Test]
@@ -108,7 +104,7 @@ namespace Rooko.Tests
 		{
 			Insert(
 				"users",
-				new [] {
+				new[] {
 					new KeyValuePair<string, object>("username", "admin"),
 					new KeyValuePair<string, object>("password", "root")
 				}
@@ -119,7 +115,7 @@ namespace Rooko.Tests
 		{
 			Delete(
 				"users",
-				new [] {
+				new[] {
 					new KeyValuePair<string, object>("username", "admin"),
 					new KeyValuePair<string, object>("password", "root")
 				}

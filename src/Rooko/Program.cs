@@ -31,7 +31,7 @@ namespace Rooko
 		
 		static void MigrateRollback(string[] args)
 		{
-			string command = args[0], assembly = args[1], connectionString = args[2], providerName =  args[3];
+			string command = args[0], assembly = args[1], connectionString = args[2], providerName = args[3];
 
 			var m = new Migrator(Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), assembly)), GetMigrationFormatter(providerName, connectionString));
 			m.Migrating += delegate(object sender, MigrationEventArgs e) {
@@ -144,7 +144,7 @@ namespace Migrations
 			);
 		}
 		
-		static IMigrationFormatter GetMigrationFormatter(string providerName,string connectionString)
+		static IMigrationFormatter GetMigrationFormatter(string providerName, string connectionString)
 		{
 			if (providerName == "System.Data.SQLite") {
 				return new SQLiteMigrationFormatter(connectionString);
@@ -156,18 +156,5 @@ namespace Migrations
 				throw new NotSupportedException();
 			}
 		}
-		
-//		static IMigrationRepository GetMigrationRepository(string providerName,string connectionString)
-//		{
-//			if(providerName == "System.Data.SQLite") {
-//				return new SQLiteMigrationRepository(connectionString);
-//			} else if (providerName == "MySql.Data.MySqlClient"){
-//				return new MySQLMigrationRepository(connectionString);
-//			} else if (providerName == "System.Data.SqlClient") {
-//				return new SqlMigrationRepository(connectionString);
-//			} else {
-//				throw new NotSupportedException();
-//			}
-//		}
 	}
 }

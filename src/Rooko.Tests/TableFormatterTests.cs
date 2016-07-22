@@ -14,8 +14,6 @@ namespace Rooko.Tests
 	public class TableFormatterTests
 	{
 		Table t;
-//		SqlMigrationFormatter s = new SqlMigrationFormatter("");
-//		MySQLMigrationFormatter m = new MySQLMigrationFormatter("");
 		IMigrationFormatter f;
 		
 		[SetUp]
@@ -51,13 +49,13 @@ namespace Rooko.Tests
 		[Test]
 		public void TestGetInsert()
 		{
-			Console.WriteLine(f.GetInsert("users", new [] { new KeyValuePair<string, object>("username", "admin"), new KeyValuePair<string, object>("password", "root") }));
+			Console.WriteLine(f.GetInsert("users", new[] { new KeyValuePair<string, object>("username", "admin"), new KeyValuePair<string, object>("password", "root") }));
 		}
 		
 		[TestAttribute]
 		public void TestGetDelete()
 		{
-			Console.WriteLine(f.GetDelete("users", new [] { new KeyValuePair<string, object>("username", "admin"), new KeyValuePair<string, object>("password", "root") }));
+			Console.WriteLine(f.GetDelete("users", new[] { new KeyValuePair<string, object>("username", "admin"), new KeyValuePair<string, object>("password", "root") }));
 		}
 		
 		[Test]
@@ -66,8 +64,8 @@ namespace Rooko.Tests
 			Console.WriteLine(
 				f.GetUpdate(
 					"users",
-					new [] { new KeyValuePair<string, object>("password", "r00t") },
-					new [] { new KeyValuePair<string, object>("username", "admin") }
+					new[] { new KeyValuePair<string, object>("password", "r00t") },
+					new[] { new KeyValuePair<string, object>("username", "admin") }
 				)
 			);
 		}
