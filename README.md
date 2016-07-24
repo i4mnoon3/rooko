@@ -1,5 +1,6 @@
 # rooko beta
 ![build](https://travis-ci.org/iescarro/rooko.svg?branch=master)
+
 Simple database migration library
 
 ## Install
