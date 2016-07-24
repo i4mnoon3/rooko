@@ -1,0 +1,4 @@
+language: csharp
+solution: src/Rooko.sln
+install:
+    - nuget restore src/Rooko.sln
