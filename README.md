@@ -40,9 +40,9 @@ public class CreateUsers : Rooko.Core.Migration
 ```
 
 ## Rooko
-Get the rooko executable [here](https://github.com/iescarro/rooko/releases).
+Get the rooko executable [here](https://github.com/iescarro/rooko/releases). Download the zip file and extract. Put it in the environment variable PATH so you can execute "rooko" anywhere in the terminal.
 
-Going to the output of this folder after compiling and running
+Going to the output folder of your migration project and execute below command will migrate the project.
 
 ```
 > rooko migrate "MyProj.Migrations.dll" "Server=.;Database=test;Trusted_Connection=True;" "System.Data.SqlClient"
