@@ -39,6 +39,9 @@ public class CreateUsers : Rooko.Core.Migration
 }
 ```
 
+## Rooko
+Get the rooko executable [here](https://github.com/iescarro/rooko/releases).
+
 Going to the output of this folder after compiling and running
 
 ```
