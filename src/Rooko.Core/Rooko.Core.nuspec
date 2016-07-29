@@ -2,11 +2,11 @@
 <package >
   <metadata>
     <id>Rooko.Core.dll</id>
-    <version>0.9</version>
+    <version>0.10</version>
     <title></title>
     <authors>Ian Escarro</authors>
     <owners>Ian Escarro</owners>
-    <licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>
+    <licenseUrl>https://opensource.org/licenses/ISC</licenseUrl>
     <projectUrl>https://github.com/iescarro/rooko</projectUrl>
     <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
