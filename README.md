@@ -1,5 +1,5 @@
 # rooko beta
-![build](https://travis-ci.org/iescarro/rooko.svg?branch=master)
+![build](https://ci.appveyor.com/api/projects/status/qnvi3yqiiv139nkn?svg=true)
 
 Simple database migration library
 
