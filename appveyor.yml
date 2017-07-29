@@ -1,6 +1,2 @@
 before_build:
   - nuget restore src
-after_build:
-  - nuget pack src/Rooko.Core/Rooko.Core.csproj
-  - nuget setApiKey dV745kLwgrpTXt8hAa/o07ICY1qjpRf2fN+7T8b99rDBP1gyot47dhVKulD9dPSV -Source https://www.nuget.org/api/v2/package
-  - nuget push *.nupkg -Source https://www.nuget.org/api/v2/package
