@@ -1,7 +1,7 @@
 version: 0.2.{build}
 
 configuration: Release
-test: off
+# test: off
 build:
   project: src/Rooko.sln
   publish_nuget: true
