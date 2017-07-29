@@ -17,5 +17,5 @@ assembly_info:
 before_build:
   - nuget restore src
 
-install:
+deploy:
   - nuget push %APPVEYOR_BUILD_FOLDER%\*.dll -ApiKey %nuget_api_key% -Source https://www.nuget.org/api/v2/package
