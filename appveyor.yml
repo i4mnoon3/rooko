@@ -1,11 +1,2 @@
 before_build:
   - nuget restore src
-deploy:
-  provider: NuGet
-  # server:                  # remove to push to NuGet.org
-  api_key:
-    # secure: m49OJ7+Jdt9an3jPcTukHA==
-    secure: dV745kLwgrpTXt8hAa/o07ICY1qjpRf2fN+7T8b99rDBP1gyot47dhVKulD9dPSV
-  skip_symbols: false
-  symbol_server:           # remove to push symbols to SymbolSource.org
-  artifact: /.*\.nupkg/
