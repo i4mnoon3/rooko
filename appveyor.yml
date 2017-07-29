@@ -18,4 +18,4 @@ before_build:
   - nuget restore src
 
 after_build:
-  - nuget push %APPVEYOR_BUILD_FOLDER%\*.dll -ApiKey %nuget_api_key% -Source https://www.nuget.org/api/v2/package
+  - nuget push *.dll -ApiKey %nuget_api_key% -Source https://www.nuget.org/api/v2/package
