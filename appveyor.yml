@@ -17,6 +17,6 @@ assembly_info:
 before_build:
   - nuget restore src
 
-after_build:
+after_test:
   - nuget pack src/Rooko.Core/Rooko.Core.csproj -Version %appveyor_build_version%
   - nuget push *.nupkg -ApiKey %nuget_api_key% -Source https://www.nuget.org/api/v2/package
