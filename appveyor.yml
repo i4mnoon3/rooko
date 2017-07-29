@@ -20,10 +20,14 @@ before_build:
 #   - nuget pack src/Rooko.Core/Rooko.Core.csproj
 #   - nuget push Rooko.Core.{version}.nupkg -ApiKey OMxkQ6MQkv7dWbFGscKliMKO/xPWGbp5cUhOnC9WXQJ/joAOTStGKWT81/Kid0ky -Source https://www.nuget.org/api/v2/package
 
+environment:
+  my_variable:
+    secure: OMxkQ6MQkv7dWbFGscKliMKO/xPWGbp5cUhOnC9WXQJ/joAOTStGKWT81/Kid0ky
+
 deploy:
   provider: NuGet
   server:
-  api_key: OMxkQ6MQkv7dWbFGscKliMKO/xPWGbp5cUhOnC9WXQJ/joAOTStGKWT81/Kid0ky
+  api_key: secure
   skip_symbols: false
   symbol_server:           # remove to push symbols to SymbolSource.org
   artifact: /.*\.nupkg/
