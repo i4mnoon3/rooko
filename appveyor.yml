@@ -1,2 +1,4 @@
 before_build:
   - nuget restore src
+after_build:
+  - nuget pack src/Rooko.Core/Rooko.Core.csproj
