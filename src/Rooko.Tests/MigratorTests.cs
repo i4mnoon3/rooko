@@ -16,8 +16,8 @@ namespace Rooko.Tests
 		[Test]
 		public void TestMigrate()
 		{
-//			Migrator m = new Migrator(Assembly.GetExecutingAssembly(), new SQLiteMigrationFormatter("data source=db.sqlite"));
-//			m.Migrate();
+			Migrator m = new Migrator(Assembly.GetExecutingAssembly(), new SQLiteMigrationFormatter("data source=db.sqlite"));
+			m.Migrate();
 		}
 		
 		[Test]
