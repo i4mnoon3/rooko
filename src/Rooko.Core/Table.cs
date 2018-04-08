@@ -106,7 +106,7 @@ namespace Rooko.Core
 		{
 			this.Name = name;
 			this.Type = type;
-			this.PrimaryKey = primaryKey;
+			this.IsPrimaryKey = primaryKey;
 			this.NotNull = notNull;
 			this.AutoIncrement = autoIncrement;
 		}
@@ -119,7 +119,7 @@ namespace Rooko.Core
 		
 		public bool NotNull { get; set; }
 
-		public bool PrimaryKey { get; set; }
+		public bool IsPrimaryKey { get; set; }
 
 		public bool AutoIncrement { get; set; }
 		
