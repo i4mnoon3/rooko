@@ -8,18 +8,18 @@ namespace Rooko.Tests
 	[TestFixture]
 	public class TableFormatterTests
 	{
-		Table t;
-		IMigrationFormatter f;
+		Table table;
+		IMigrationFormatter mySQLFormatter;
 		
 		[SetUp]
 		public void Setup()
 		{
-			t = new Table("users");
-			t.AddColumn("id", "integer", true, true, true);
-			t.AddColumn("name");
-			t.AddColumn("password");
+			table = new Table("users");
+			table.AddColumn("id", "integer", true, true, true);
+			table.AddColumn("name");
+			table.AddColumn("password");
 			
-			f = new MySQLMigrationFormatter("");
+			mySQLFormatter = new MySQLMigrationFormatter("");
 		}
 		
 		[TearDown]
@@ -28,47 +28,81 @@ namespace Rooko.Tests
 		}
 		
 		[Test]
-		public void TestGetCreateTable()
+		public void TestCreateTable()
 		{
-			Console.WriteLine(f.GetCreateTable(t));
-			Console.WriteLine(f.GetDropTable("users"));
+			const string query = @"CREATE TABLE users(
+	id integer not null primary key auto_increment,
+	name varchar(255),
+	password varchar(255)
+);";
+			Assert.AreEqual(query, mySQLFormatter.CreateTable(table));
+			
 		}
 		
 		[Test]
-		public void TestGetAddColumn()
+		public void TestDropTable()
 		{
-			Console.WriteLine(f.GetAddColumn("users", new Column("username"), new Column("salt")));
-			Console.WriteLine(f.GetDropColumn("users", "username", "salt"));
+			const string expected = @"DROP TABLE users;";
+			string actual = mySQLFormatter.DropTable("users");
+			Assert.AreEqual(expected, actual);
 		}
 		
 		[Test]
-		public void TestGetInsert()
+		public void TestAddColumn()
 		{
-			Console.WriteLine(f.GetInsert("users", new[] { new KeyValuePair<string, object>("username", "admin"), new KeyValuePair<string, object>("password", "root") }));
+			const string expected = @"ALTER TABLE users ADD username varchar(255);
+ALTER TABLE users ADD salt varchar(255);";
+			string actual = mySQLFormatter.AddColumn("users", new Column("username"), new Column("salt"));
+			Assert.AreEqual(expected, actual);
+		}
+		
+		[Test]
+		public void TestDropColumn()
+		{
+			const string expected = @"ALTER TABLE users
+DROP username, DROP salt;";
+			string actual = mySQLFormatter.DropColumn("users", "username", "salt");
+			Console.WriteLine(actual);
+			Assert.AreEqual(expected, actual);
+		}
+		
+		[Test]
+		public void TestInsert()
+		{
+			const string expected = @"INSERT INTO users(username, password)
+VALUES('admin', 'root')";
+			string actual = mySQLFormatter.Insert("users", new[] { new KeyValuePair<string, object>("username", "admin"), new KeyValuePair<string, object>("password", "root") });
+			Assert.AreEqual(expected, actual);
 		}
 		
 		[TestAttribute]
-		public void TestGetDelete()
+		public void TestDelete()
 		{
-			Console.WriteLine(f.GetDelete("users", new[] { new KeyValuePair<string, object>("username", "admin"), new KeyValuePair<string, object>("password", "root") }));
+			const string expected = @"DELETE FROM users WHERE username = 'admin' AND password = 'root'";
+			string actual = mySQLFormatter.Delete("users", new[] { new KeyValuePair<string, object>("username", "admin"), new KeyValuePair<string, object>("password", "root") });
+			Assert.AreEqual(expected, actual);
 		}
 		
 		[Test]
-		public void TestGetUpdate()
+		public void TestUpdate()
 		{
-			Console.WriteLine(
-				f.GetUpdate(
-					"users",
-					new[] { new KeyValuePair<string, object>("password", "r00t") },
-					new[] { new KeyValuePair<string, object>("username", "admin") }
-				)
+			const string expected = @"UPDATE users SET password = 'r00t' WHERE username = 'admin'";
+			string actual = mySQLFormatter.Update(
+				"users",
+				new[] { new KeyValuePair<string, object>("password", "r00t") },
+				new[] { new KeyValuePair<string, object>("username", "admin") }
 			);
+			Assert.AreEqual(expected, actual);
 		}
 		
 		[Test]
-		public void TestGetCheckSchema()
+		public void TestCheckSchema()
 		{
-			Console.WriteLine(f.GetCheckSchema());
+			const string expected = @"SELECT 1 FROM INFORMATION_SCHEMA.TABLES
+WHERE table_name = 'schema_migrations' AND table_schema = ''";
+			string actual = mySQLFormatter.CheckSchema();
+			Console.WriteLine(actual);
+			Assert.AreEqual(expected, actual);
 		}
 	}
 }
