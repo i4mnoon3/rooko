@@ -12,14 +12,16 @@ namespace Rooko.Tests
 		public void TestMigrate()
 		{
 			Migrator m = new Migrator(Assembly.GetExecutingAssembly(), new SQLiteMigrationFormatter("data source=db.sqlite"));
+			m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
 			m.Migrate();
 		}
 		
 		[Test]
 		public void TestRollback()
 		{
-//			Migrator m = new Migrator(Assembly.GetExecutingAssembly(), new SQLiteMigrationFormatter("data source=db.sqlite"));
-//			m.Rollback();
+			Migrator m = new Migrator(Assembly.GetExecutingAssembly(), new SQLiteMigrationFormatter("data source=db.sqlite"));
+			m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
+			m.Rollback();
 		}
 	}
 }
