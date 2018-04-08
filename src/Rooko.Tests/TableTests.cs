@@ -1,9 +1,4 @@
-﻿//	<file>
-//		<license></license>
-//		<owner name="Ian Escarro" email="ian.escarro@gmail.com"/>
-//	</file>
-
-using System;
+﻿using System;
 using NUnit.Framework;
 using Rooko.Core;
 
@@ -25,8 +20,11 @@ namespace Rooko.Tests
 		}
 		
 		[Test]
-		public void TestMethod()
+		public void TestProperties()
 		{
+			Assert.AreEqual("items", t.Name);
+			var c = t.Columns[0];
+			Assert.IsTrue(c.IsPrimaryKey);
 			Assert.AreEqual(4, t.Columns.Count);
 		}
 	}
