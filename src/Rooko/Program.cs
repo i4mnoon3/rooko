@@ -111,13 +111,14 @@ namespace Migrations
 		
 		static void DisplayVersion()
 		{
-			Console.WriteLine(Assembly.GetExecutingAssembly().GetName().Version);
+			var version = Assembly.GetExecutingAssembly().GetName().Version;
+			Console.WriteLine(string.Format("{0}.{1}", version.Major, version.Minor));
 		}
 		
 		static void DisplayHelp()
 		{
 			Console.WriteLine(
-				@"Rooko is a simple database migration tool for .Net.
+				@"Rooko is a simple database migration tool for .NET.
 
   Usage:
     rook -v
