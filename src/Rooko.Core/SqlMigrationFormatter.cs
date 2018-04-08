@@ -14,13 +14,11 @@ namespace Rooko.Core
 	// Example: migrate "..\src\Rooko.Tests\bin\Debug\Rooko.Tests.dll" "Server=.;Database=test;Trusted_Connection=True;" "System.Data.SqlClient"
 	public class SqlMigrationFormatter : IMigrationFormatter
 	{
-//		SqlConnection connection;
 		string connectionString;
 		string database;
 		
 		public SqlMigrationFormatter(string connectionString)
 		{
-//			this.connection = new SqlConnection(connectionString);
 			this.connectionString = connectionString;
 		}
 		
@@ -31,26 +29,28 @@ namespace Rooko.Core
 			return connection;
 		}
 		
-		public string GetCreateTable(Table table)
+		public string CreateTable(Table table)
 		{
 			string cols = "";
 			int i = 0;
 			foreach (var c in table.Columns) {
 				cols += c.Name + " " + c.Type;
-				cols += c.PrimaryKey ? " primary key" : "";
+				cols += c.IsPrimaryKey ? " primary key" : "";
 				cols += c.NotNull ? " not null" : "";
 				cols += c.AutoIncrement ? " identity" : "";
 				cols += i++ < table.Columns.Count - 1 ? ", " : "";
 			}
-			return string.Format("create table {0}({1})", table.Name, cols);
+			return string.Format(@"CREATE TABLE {0}(
+{1}
+);", table.Name, cols);
 		}
 		
-		public string GetDropTable(string tableName)
+		public string DropTable(string tableName)
 		{
-			return string.Format("drop table {0}", tableName);
+			return string.Format("DROP TABLE {0};", tableName);
 		}
 		
-		public string GetAddColumn(string tableName, params Column[] columns)
+		public string AddColumn(string tableName, params Column[] columns)
 		{
 			string cols = "";
 			int i = 0;
@@ -58,19 +58,19 @@ namespace Rooko.Core
 				cols += c.Name + " " + c.Type;
 				cols += i++ < columns.Length - 1 ? ", " : "";
 			}
-			return string.Format("alter table {0} add {1}", tableName, cols);
+			return string.Format("ALTER TABLE {0} ADD {1}", tableName, cols);
 		}
 		
-		public string GetAddColumn(string tableName, params string[] columns)
+		public string AddColumn(string tableName, params string[] columns)
 		{
 			var cols = new List<Column>();
 			foreach (var c in columns) {
 				cols.Add(new Column(c));
 			}
-			return GetAddColumn(tableName, cols.ToArray());
+			return AddColumn(tableName, cols.ToArray());
 		}
 		
-		public string GetDropColumn(string tableName, params string[] columns)
+		public string DropColumn(string tableName, params string[] columns)
 		{
 			string cols = "";
 			int i = 0;
@@ -78,10 +78,10 @@ namespace Rooko.Core
 				cols += c;
 				cols += i++ < columns.Length - 1 ? ", " : "";
 			}
-			return string.Format("alter table {0} drop column {1}", tableName, cols);
+			return string.Format("ALTER TABLE {0} DROP COLUMN {1};", tableName, cols);
 		}
 		
-		public string GetInsert(string tableName, params Column[] columns)
+		public string Insert(string tableName, params Column[] columns)
 		{
 			string cols = "", vals = "";
 			int i = 0;
@@ -100,16 +100,16 @@ namespace Rooko.Core
 			string @where = "";
 			int i = 0;
 			if (columns.Length > 0) {
-				@where = " where ";
+				@where = " WHERE ";
 				foreach (var c in columns) {
 					@where += c.Name + " = '" + c.Value + "'";
-					@where += i++ < columns.Length - 1 ? " and " : "";
+					@where += i++ < columns.Length - 1 ? " AND " : "";
 				}
 			}
-			return string.Format("delete from {0} {1}", tableName, @where);
+			return string.Format("DELETE FROM {0} {1};", tableName, @where);
 		}
 		
-		public string GetInsert(string tableName, ICollection<KeyValuePair<string, object>> values)
+		public string Insert(string tableName, ICollection<KeyValuePair<string, object>> values)
 		{
 			string cols = "", vals = "";
 			int i = 1;
@@ -154,7 +154,7 @@ namespace Rooko.Core
 			return string.Format("create table schema_migrations(id integer not null primary key identity, version varchar(255))");
 		}
 		
-		public string GetCheckSchema()
+		public string CheckSchema()
 		{
 			return string.Format("select 1 from {0}.information_schema.tables where table_name = 'schema_migrations'", database);
 		}
