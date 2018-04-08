@@ -9,3 +9,4 @@ src/**/StyleCopViolations.xml
 src/Rooko.Core/Rooko.Core.csproj.user
 src/Rooko.Core/Rooko.Core.OpenCover.Settings
 src/Rooko/Rooko.csproj.user
+*.backup
