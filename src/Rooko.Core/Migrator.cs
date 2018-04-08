@@ -72,12 +72,13 @@ namespace Rooko.Core
 		{
 			try {
 				string latestVersion = repository.ReadLatestVersion();
-				if (latestVersion != null && latestVersion != "") {
+				if (!string.IsNullOrEmpty(latestVersion)) {
 					Migration m = migrations.Find(x => x.Version == latestVersion);
 					if (m != null) {
 						m.Migrating += new EventHandler<MigrationEventArgs>(MigrationMigrating);
 						m.Rollback();
 						repository.Delete(m);
+						m.Migrating -= new EventHandler<MigrationEventArgs>(MigrationMigrating);
 					}
 				}
 			} catch (Exception ex) {

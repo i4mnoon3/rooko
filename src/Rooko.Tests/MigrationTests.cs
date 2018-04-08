@@ -8,45 +8,61 @@ namespace Rooko.Tests
 	[TestFixture]
 	public class MigrationTests
 	{
-		CreateUsers m1;
-		AddUsernameToUsers m2;
+		CreateUsers createUsers;
+		AddUsernameToUsers addUsernameToUsers;
+		InsertRootUser insertRootUser;
 		
-		[SetUpAttribute]
+		[SetUp]
 		public void Setup()
 		{
-			m1 = new CreateUsers();
-			m1.Migrating += delegate(object sender, MigrationEventArgs e) {
+			createUsers = new CreateUsers();
+			createUsers.Migrating += delegate(object sender, MigrationEventArgs e) {
 				Console.WriteLine(e.Message);
 			};
 			
-			m2 = new AddUsernameToUsers();
-			m2.Migrating += delegate(object sender, MigrationEventArgs e) {
+			addUsernameToUsers = new AddUsernameToUsers();
+			addUsernameToUsers.Migrating += delegate(object sender, MigrationEventArgs e) {
 				Console.WriteLine(e.Message);
 			};
+			
+			insertRootUser = new InsertRootUser();
+			insertRootUser.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
 		}
 		
 		[Test]
-		public void TestCreateItemsMigrate()
+		public void TestCreateUsersMigrate()
 		{
-			m1.Migrate();
+			createUsers.Migrate();
 		}
 		
 		[Test]
-		public void TestCreateItemsRollback()
+		public void TestCreateUsersRollback()
 		{
-			m1.Rollback();
+			createUsers.Rollback();
 		}
 		
 		[Test]
-		public void TestAddPriceToItemsMigrate()
+		public void TestAddUsernameToUsersMigrate()
 		{
-			m2.Migrate();
+			addUsernameToUsers.Migrate();
 		}
 		
 		[Test]
-		public void TestAddPriceToItemsRollback()
+		public void TestAddUsernameToUsersRollback()
 		{
-			m2.Rollback();
+			addUsernameToUsers.Rollback();
+		}
+		
+		[Test]
+		public void TestInsertRootUserMigrate()
+		{
+			insertRootUser.Migrate();
+		}
+		
+		[Test]
+		public void TestInsertRootUserRollback()
+		{
+			insertRootUser.Rollback();
 		}
 	}
 	
