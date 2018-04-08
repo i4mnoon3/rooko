@@ -13,37 +13,37 @@ namespace Rooko.Core
 	{
 		IDbConnection CreateConnection();
 		
-		string GetCreateTable(Table table);
+		string CreateTable(Table table);
 		
-		string GetDropTable(string tableName);
+		string DropTable(string tableName);
 		
-		string GetAddColumn(string tableName, params Column[] columns);
+		string AddColumn(string tableName, params Column[] columns);
 		
-		string GetDropColumn(string tableName, params string[] columns);
+		string DropColumn(string tableName, params string[] columns);
 		
-		string GetInsert(string tableName, ICollection<KeyValuePair<string, object>> values);
+		string Insert(string tableName, ICollection<KeyValuePair<string, object>> values);
 		
-		string GetDelete(string tableName, ICollection<KeyValuePair<string, object>> where);
+		string Delete(string tableName, ICollection<KeyValuePair<string, object>> @where);
 		
-		string GetUpdate(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> where);
+		string Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> @where);
 		
-		string GetCheckSchema();
+		string CheckSchema();
 		
-		string GetCreateSchema();
+		string CreateSchema();
 	}
 	
 	public class MigrationRepository : BaseMigrationRepository
 	{
-		IMigrationFormatter f;
+		IMigrationFormatter formatter;
 		
-		public MigrationRepository(IMigrationFormatter f) : base(f.CreateConnection())
+		public MigrationRepository(IMigrationFormatter formatter) : base(formatter.CreateConnection())
 		{
-			this.f = f;
+			this.formatter = formatter;
 		}
 		
 		public bool VersionExists(string version)
 		{
-			string query = string.Format("select 1 from schema_migrations where version = '{0}'", version);
+			string query = string.Format("SELECT 1 FROM SCHEMA_MIGRATIONS WHERE VERSION = '{0}'", version);
 			using (var r = ExecuteReader(query)) {
 				if (r.Read()) {
 					return true;
@@ -55,7 +55,7 @@ namespace Rooko.Core
 		public string ReadLatestVersion()
 		{
 			string m = null;
-			string query = string.Format("select version from schema_migrations order by id desc");
+			string query = string.Format("SELECT version FROM SCHEMA_MIGRATIONS ORDER BY id DESC");
 			using (var r = ExecuteReader(query)) {
 				if (r.Read()) {
 					m = r.GetString(0);
@@ -66,24 +66,24 @@ namespace Rooko.Core
 		
 		public void Save(Migration migration)
 		{
-			string query = string.Format("insert into schema_migrations(version) values('{0}')", migration.Version);
+			string query = string.Format("INSERT INTO schema_migrations(version) VALUES('{0}')", migration.Version);
 			ExecuteNonQuery(query);
 		}
 		
 		public void Delete(Migration migration)
 		{
-			string query = string.Format("delete from schema_migrations where version = '{0}'", migration.Version);
+			string query = string.Format("DELETE FROM schema_migrations WHERE VERSION = '{0}'", migration.Version);
 			ExecuteNonQuery(query);
 		}
 		
 		public void BuildSchema()
 		{
-			ExecuteNonQuery(f.GetCreateSchema());
+			ExecuteNonQuery(formatter.CreateSchema());
 		}
 		
 		public bool SchemaExists()
 		{
-			using (var r = ExecuteReader(f.GetCheckSchema())) {
+			using (var r = ExecuteReader(formatter.CheckSchema())) {
 				if (r.Read()) {
 					return true;
 				}
@@ -93,37 +93,37 @@ namespace Rooko.Core
 		
 		public void CreateTable(Table table)
 		{
-			ExecuteNonQuery(f.GetCreateTable(table));
+			ExecuteNonQuery(formatter.CreateTable(table));
 		}
 		
 		public void DropTable(string tableName)
 		{
-			ExecuteNonQuery(f.GetDropTable(tableName));
+			ExecuteNonQuery(formatter.DropTable(tableName));
 		}
 		
 		public void AddColumns(string tableName, params Column[] columns)
 		{
-			ExecuteNonQuery(f.GetAddColumn(tableName, columns));
+			ExecuteNonQuery(formatter.AddColumn(tableName, columns));
 		}
 		
 		public void RemoveColumns(string tableName, params string[] columns)
 		{
-			ExecuteNonQuery(f.GetDropColumn(tableName, columns));
+			ExecuteNonQuery(formatter.DropColumn(tableName, columns));
 		}
 		
-		public void Insert(string tableName, ICollection<KeyValuePair<string, object>> vals)
+		public void Insert(string tableName, ICollection<KeyValuePair<string, object>> values)
 		{
-			ExecuteNonQuery(f.GetInsert(tableName, vals));
+			ExecuteNonQuery(formatter.Insert(tableName, values));
 		}
 		
-		public void Delete(string tableName, ICollection<KeyValuePair<string, object>> where)
+		public void Delete(string tableName, ICollection<KeyValuePair<string, object>> @where)
 		{
-			ExecuteNonQuery(f.GetDelete(tableName, where));
+			ExecuteNonQuery(formatter.Delete(tableName, @where));
 		}
 		
-		public void Update(string tableName, ICollection<KeyValuePair<string, object>> vals, ICollection<KeyValuePair<string, object>> where)
+		public void Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> @where)
 		{
-			ExecuteNonQuery(f.GetUpdate(tableName, vals, where));
+			ExecuteNonQuery(formatter.Update(tableName, values, @where));
 		}
 	}
 	

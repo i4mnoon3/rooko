@@ -123,7 +123,7 @@ namespace Rooko.Core
 			return string.Format("insert into {0}({1}) values({2})", tableName, cols, vals);
 		}
 		
-		public string GetDelete(string tableName, ICollection<KeyValuePair<string, object>> @where)
+		public string Delete(string tableName, ICollection<KeyValuePair<string, object>> @where)
 		{
 			string wher = "";
 			int i = 1;
@@ -134,7 +134,7 @@ namespace Rooko.Core
 			return string.Format("delete from {0} where {1}", tableName, wher);
 		}
 		
-		public string GetUpdate(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> @where)
+		public string Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> @where)
 		{
 			string vals = "", wher = "";
 			int i = 1;
@@ -149,7 +149,7 @@ namespace Rooko.Core
 			return string.Format("update {0} set {1} where {2}", tableName, vals, wher);
 		}
 		
-		public string GetCreateSchema()
+		public string CreateSchema()
 		{
 			return string.Format("create table schema_migrations(id integer not null primary key identity, version varchar(255))");
 		}

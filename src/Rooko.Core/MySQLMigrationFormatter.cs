@@ -33,14 +33,15 @@ namespace Rooko.Core
 			return connection;
 		}
 		
-		public string GetCreateSchema()
+		public string CreateSchema()
 		{
 			return string.Format("create table schema_migrations(id integer not null primary key auto_increment, version varchar(255))");
 		}
 		
-		public string GetCheckSchema()
+		public string CheckSchema()
 		{
-			return string.Format("select 1 from information_schema.tables where table_name = 'schema_migrations' and table_schema = '{0}'", database);
+			return string.Format(@"SELECT 1 FROM INFORMATION_SCHEMA.TABLES
+WHERE table_name = 'schema_migrations' AND table_schema = '{0}'", database);
 		}
 		
 		public string CreateTable(Table table)
@@ -116,19 +117,19 @@ namespace Rooko.Core
 VALUES({2})", tableName, cols, vals);
 		}
 		
-		public string GetDelete(string tableName, ICollection<KeyValuePair<string, object>> @where)
+		public string Delete(string tableName, ICollection<KeyValuePair<string, object>> @where)
 		{
 			string wher = "";
 			int i = 1;
 			foreach (var w in @where) {
 				wher += w.Key + " = '" + w.Value + "'";
 				
-				wher += i++ < @where.Count ? " and " : "";
+				wher += i++ < @where.Count ? " AND " : "";
 			}
-			return string.Format("delete from {0} where {1}", tableName, wher);
+			return string.Format("DELETE FROM {0} WHERE {1}", tableName, wher);
 		}
 		
-		public string GetUpdate(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> @where)
+		public string Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> @where)
 		{
 			string vals = "", wher = "";
 			int i = 1;
@@ -141,7 +142,7 @@ VALUES({2})", tableName, cols, vals);
 				wher += w.Key + " = '" + w.Value + "'";
 				wher += i++ < @where.Count ? ", " : "";
 			}
-			return string.Format("update {0} set {1} where {2}", tableName, vals, wher);
+			return string.Format("UPDATE {0} SET {1} WHERE {2}", tableName, vals, wher);
 		}
 	}
 }

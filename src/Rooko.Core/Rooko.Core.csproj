@@ -82,10 +82,10 @@
     <Compile Include="Migration.cs" />
     <Compile Include="MigrationRepository.cs" />
     <Compile Include="Migrator.cs" />
-    <Compile Include="MySQLRepository.cs" />
+    <Compile Include="MySQLMigrationFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SQLiteRepository.cs" />
-    <Compile Include="SqlRepository.cs" />
+    <Compile Include="SQLiteMigrationFormatter.cs" />
+    <Compile Include="SqlMigrationFormatter.cs" />
     <Compile Include="Table.cs" />
   </ItemGroup>
   <ItemGroup>
