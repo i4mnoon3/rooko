@@ -8,24 +8,24 @@ namespace Rooko.Tests
 	[TestFixture]
 	public class MigrationTests
 	{
-		CreateUsers createUsers;
-		AddUsernameToUsers addUsernameToUsers;
-		InsertRootUser insertRootUser;
+		CreateTable createUsers;
+		AddColumnToTable addUsernameToUsers;
+		InsertValueToTable insertRootUser;
 		
 		[SetUp]
 		public void Setup()
 		{
-			createUsers = new CreateUsers();
+			createUsers = new CreateTable();
 			createUsers.Migrating += delegate(object sender, MigrationEventArgs e) {
 				Console.WriteLine(e.Message);
 			};
 			
-			addUsernameToUsers = new AddUsernameToUsers();
+			addUsernameToUsers = new AddColumnToTable();
 			addUsernameToUsers.Migrating += delegate(object sender, MigrationEventArgs e) {
 				Console.WriteLine(e.Message);
 			};
 			
-			insertRootUser = new InsertRootUser();
+			insertRootUser = new InsertValueToTable();
 			insertRootUser.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
 		}
 		
@@ -66,58 +66,57 @@ namespace Rooko.Tests
 		}
 	}
 	
-	public class CreateUsers : Migration
+	public class CreateTable : Migration
 	{
-		public CreateUsers() : base("E128A916-A06E-4142-B73D-DD0E6811D618")
+		public CreateTable() : base("E128A916-A06E-4142-B73D-DD0E6811D618")
 		{
 		}
 		
 		public override void Migrate()
 		{
 			CreateTable(
-				"users",
+				"table",
 				new Column("id", "integer", true, true, true),
-				new Column("name"),
-				new Column("password")
+				new Column("some_column"),
+				new Column("another_column")
 			);
 		}
 		
 		public override void Rollback()
 		{
-			DropTable("users");
+			DropTable("table");
 		}
 	}
 	
-	public class AddUsernameToUsers : Migration
+	public class AddColumnToTable : Migration
 	{
-		public AddUsernameToUsers() : base("DA8965AD-31E3-4085-8125-8396758C4A82")
+		public AddColumnToTable() : base("DA8965AD-31E3-4085-8125-8396758C4A82")
 		{
 		}
 		
 		public override void Migrate()
 		{
-			AddColumn("users", new Column("username"));
+			AddColumn("table", new Column("another_column"));
 		}
 		
 		public override void Rollback()
 		{
-			RemoveColumn("users", "username");
+			RemoveColumn("table", "another_column");
 		}
 	}
 	
-	public class InsertRootUser : Migration
+	public class InsertValueToTable : Migration
 	{
-		public InsertRootUser() : base("116AA4B6-5DEE-4621-8D39-DB0FC5D9110E")
+		public InsertValueToTable() : base("116AA4B6-5DEE-4621-8D39-DB0FC5D9110E")
 		{
 		}
 		
 		public override void Migrate()
 		{
 			Insert(
-				"users",
+				"table",
 				new[] {
-					new KeyValuePair<string, object>("username", "admin"),
-					new KeyValuePair<string, object>("password", "root")
+					new KeyValuePair<string, object>("some_column", "some_value"),
 				}
 			);
 		}
@@ -125,10 +124,70 @@ namespace Rooko.Tests
 		public override void Rollback()
 		{
 			Delete(
-				"users",
+				"table",
 				new[] {
-					new KeyValuePair<string, object>("username", "admin"),
-					new KeyValuePair<string, object>("password", "root")
+					new KeyValuePair<string, object>("some_column", "some_value"),
+				}
+			);
+		}
+	}
+	
+	public class UpdateTable : Migration
+	{
+		public UpdateTable() : base("38AC0CD4-9306-41AA-A91C-86B0140DB101")
+		{
+		}
+		
+		public override void Migrate()
+		{
+			Update(
+				"table",
+				new[] {
+					new KeyValuePair<string, object>("some_column", "new_value")
+				},
+				new[] {
+					new KeyValuePair<string, object>("id", 1)
+				}
+			);
+		}
+		
+		public override void Rollback()
+		{
+			Update(
+				"table",
+				new[] {
+					new KeyValuePair<string, object>("some_column", "some_value")
+				},
+				new[] {
+					new KeyValuePair<string, object>("id", 1)
+				}
+			);
+		}
+	}
+	
+	public class DeleteFromTable : Migration
+	{
+		public DeleteFromTable() : base("AACB1EBA-85DF-4DFD-A3AF-998F2BB18DE6")
+		{
+		}
+		
+		public override void Migrate()
+		{
+			Delete(
+				"table",
+				new[] {
+					new KeyValuePair<string, object>("id", "1"),
+				}
+			);
+		}
+		
+		public override void Rollback()
+		{
+			Insert(
+				"table",
+				new[] {
+					new KeyValuePair<string, object>("id", "1"),
+					new KeyValuePair<string, object>("some_column", "some_value"),
 				}
 			);
 		}
