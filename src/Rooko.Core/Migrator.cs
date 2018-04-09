@@ -12,8 +12,9 @@ namespace Rooko.Core
 		IMigrationRepository repository;
 		List<Migration> migrations;
 		
-		public Migrator(Assembly assembly, IMigrationFormatter formatter) : this(new MigrationRepository(formatter))
+		public Migrator(Assembly assembly, IMigrationFormatter formatter)
 		{
+			this.migrations = new List<Migration>();
 			foreach (var t in assembly.GetTypes()) {
 				if (t != typeof(Migration) && typeof(Migration).IsAssignableFrom(t)) {
 					var m = (Migration)assembly.CreateInstance(t.ToString());
@@ -30,10 +31,6 @@ namespace Rooko.Core
 		{
 			this.migrations = migrations;
 			this.repository = repository;
-		}
-		
-		public Migrator(IMigrationRepository repository) : this(new List<Migration>(), repository)
-		{
 		}
 		
 		public event EventHandler<MigrationEventArgs> Migrating;
@@ -82,10 +79,32 @@ namespace Rooko.Core
 				if (!string.IsNullOrEmpty(latestVersion)) {
 					Migration m = migrations.Find(x => x.Version == latestVersion);
 					if (m != null) {
-						m.Migrating += new EventHandler<MigrationEventArgs>(MigrationMigrating);
-						m.Rollback();
-						repository.Delete(m);
-						m.Migrating -= new EventHandler<MigrationEventArgs>(MigrationMigrating);
+						try {
+							m.Migrating += new EventHandler<MigrationEventArgs>(MigrationMigrating);
+							
+							m.TableCreate += new EventHandler<TableEventArgs>(MigrationTableCreate);
+							m.TableDrop += new EventHandler<TableEventArgs>(MigrationTableDrop);
+							m.ColumnAdd += new EventHandler<TableEventArgs>(MigrationColumnAdd);
+							m.ColumnRemove += new EventHandler<TableEventArgs>(MigrationColumnRemove);
+							m.Inserting += new EventHandler<TableEventArgs>(MigrationInserting);
+							m.Deleting += new EventHandler<TableEventArgs>(MigrationDeleting);
+							m.Updating += new EventHandler<TableEventArgs>(MigrationUpdating);
+							
+							m.Rollback();
+							repository.Delete(m);
+						} catch {
+							throw;
+						} finally {
+							m.Migrating -= new EventHandler<MigrationEventArgs>(MigrationMigrating);
+					
+							m.TableCreate -= new EventHandler<TableEventArgs>(MigrationTableCreate);
+							m.TableDrop -= new EventHandler<TableEventArgs>(MigrationTableDrop);
+							m.ColumnAdd -= new EventHandler<TableEventArgs>(MigrationColumnAdd);
+							m.ColumnRemove -= new EventHandler<TableEventArgs>(MigrationColumnRemove);
+							m.Inserting -= new EventHandler<TableEventArgs>(MigrationInserting);
+							m.Deleting -= new EventHandler<TableEventArgs>(MigrationDeleting);
+							m.Updating -= new EventHandler<TableEventArgs>(MigrationUpdating);
+						}
 					}
 				}
 			} catch (Exception ex) {
