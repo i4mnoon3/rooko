@@ -1,9 +1,4 @@
-﻿//	<file>
-//		<license></license>
-//		<owner name="Ian Escarro" email="ian.escarro@gmail.com"/>
-//	</file>
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SQLite;
@@ -14,19 +9,31 @@ namespace Rooko.Core
 {
 	public class Migrator
 	{
-		MigrationRepository repository;
+		IMigrationRepository repository;
 		List<Migration> migrations;
 		
-		public Migrator(Assembly assembly, IMigrationFormatter formatter)
+		public Migrator(Assembly assembly, IMigrationFormatter formatter) : this(new MigrationRepository(formatter))
 		{
-			this.repository = new MigrationRepository(formatter);
-			this.migrations = new List<Migration>();
 			foreach (var t in assembly.GetTypes()) {
 				if (t != typeof(Migration) && typeof(Migration).IsAssignableFrom(t)) {
 					var m = (Migration)assembly.CreateInstance(t.ToString());
 					migrations.Add(m);
 				}
 			}
+		}
+		
+		public Migrator(List<Migration> migrations, IMigrationFormatter formatter) : this(migrations, new MigrationRepository(formatter))
+		{
+		}
+		
+		public Migrator(List<Migration> migrations, IMigrationRepository repository)
+		{
+			this.migrations = migrations;
+			this.repository = repository;
+		}
+		
+		public Migrator(IMigrationRepository repository) : this(new List<Migration>(), repository)
+		{
 		}
 		
 		public event EventHandler<MigrationEventArgs> Migrating;

@@ -6,7 +6,7 @@ using Rooko.Core;
 namespace Rooko.Tests
 {
 	[TestFixture]
-	public class TableFormatterTests
+	public class MySQLMigrationFormatterTests
 	{
 		Table table;
 		IMigrationFormatter mySQLFormatter;

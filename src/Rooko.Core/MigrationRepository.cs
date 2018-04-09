@@ -1,9 +1,4 @@
-﻿//	<file>
-//		<license></license>
-//		<owner name="Ian Escarro" email="ian.escarro@gmail.com"/>
-//	</file>
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 
@@ -32,7 +27,36 @@ namespace Rooko.Core
 		string CreateSchema();
 	}
 	
-	public class MigrationRepository : BaseMigrationRepository
+	public interface IMigrationRepository
+	{
+		bool SchemaExists();
+		
+		bool VersionExists(string version);
+		
+		void Save(Migration migration);
+		
+		void BuildSchema();
+		
+		string ReadLatestVersion();
+		
+		void Delete(Migration migration);
+		
+		void Delete(string tableName, ICollection<KeyValuePair<string, object>> @where);
+		
+		void Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> @where);
+		
+		void Insert(string tableName, ICollection<KeyValuePair<string, object>> values);
+		
+		void AddColumns(string tableName, params Column[] columns);
+		
+		void RemoveColumns(string tableName, params string[] columns);
+		
+		void CreateTable(Table table);
+		
+		void DropTable(string tableName);
+	}
+	
+	public class MigrationRepository : BaseMigrationRepository, IMigrationRepository
 	{
 		IMigrationFormatter formatter;
 		
