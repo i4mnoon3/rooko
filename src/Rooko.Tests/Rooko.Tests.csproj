@@ -87,6 +87,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColumnTests.cs" />
     <Compile Include="MainForm.cs" />
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -97,6 +98,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SQLiteMigrationFormatterTests.cs" />
+    <Compile Include="SqlMigrationFormatterTests.cs" />
     <Compile Include="TableTests.cs" />
   </ItemGroup>
   <ItemGroup>
