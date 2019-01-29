@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using MyProj.Migrations;
 using NUnit.Framework;
 using Rooko.Core;
 
