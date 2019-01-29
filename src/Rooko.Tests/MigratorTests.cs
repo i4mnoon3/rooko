@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Reflection;
 using MyProj.Migrations;
 using NUnit.Framework;
@@ -12,7 +13,6 @@ namespace Rooko.Tests
     {
         List<Migration> migrations;
         List<IMigrationFormatter> formatters;
-        IMigrationFormatter sqlMigrationFormatter = new SqlMigrationFormatter(@"Server=.\SQLEXPRESS;Database=test;Trusted_Connection=True;");
         
         [SetUp]
         public void Setup()
@@ -23,38 +23,30 @@ namespace Rooko.Tests
             migrations.Add(new _20190129212625InsertAdminToUsers());
             migrations.Add(new _20190129212903UpdateAdminEmail());
             migrations.Add(new _20190129213034DeleteUserAdmin());
-            
-            formatters = new List<IMigrationFormatter>();
-            formatters.Add(sqlMigrationFormatter);
-            formatters.Add(new SQLiteMigrationFormatter("data source=db.sqlite"));
         }
         
         [Test]
         [Ignore]
         public void TestMigrateFromAssembly()
         {
-            foreach (var f in formatters) {
-                Migrator m = new Migrator(Assembly.GetExecutingAssembly(), f);
-                m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
-                m.Migrate();
-            }
+            Migrator m = new Migrator(Assembly.GetExecutingAssembly(), new MigrationFormatterStub());
+            m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
+            m.Migrate();
         }
         
         [Test]
         [Ignore]
         public void TestRollbackFromAssembly()
         {
-            foreach (var f in formatters) {
-                Migrator m = new Migrator(Assembly.GetExecutingAssembly(), f);
-                m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
-                m.Rollback();
-            }
+            Migrator m = new Migrator(Assembly.GetExecutingAssembly(), new MigrationFormatterStub());
+            m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
+            m.Rollback();
         }
         
         [Test]
         public void TestMigrate()
         {
-            var m = new Migrator(migrations, sqlMigrationFormatter);
+            var m = new Migrator(migrations, new MigrationRepositoryStub());
             m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
             m.Migrate();
         }
@@ -62,7 +54,7 @@ namespace Rooko.Tests
         [Test]
         public void TestRollback()
         {
-            var m = new Migrator(migrations, sqlMigrationFormatter);
+            var m = new Migrator(migrations, new MigrationRepositoryStub());
             m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
             m.Rollback();
             m.Rollback();
@@ -72,20 +64,73 @@ namespace Rooko.Tests
         }
     }
     
-    public class MigrationFormatterStub : IMigrationRepository
+    public class MigrationFormatterStub : IMigrationFormatter
+    {
+        public IDbConnection CreateConnection()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public string CreateTable(Table table)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public string DropTable(string tableName)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public string AddColumn(string tableName, params Column[] columns)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public string DropColumn(string tableName, params string[] columns)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public string Insert(string tableName, ICollection<KeyValuePair<string, object>> values)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public string Delete(string tableName, ICollection<KeyValuePair<string, object>> @where)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public string Update(string tableName, ICollection<KeyValuePair<string, object>> values, ICollection<KeyValuePair<string, object>> @where)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public string CheckSchema()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public string CreateSchema()
+        {
+            throw new NotImplementedException();
+        }
+    }
+    
+    public class MigrationRepositoryStub : IMigrationRepository
     {
         bool schemaExists;
         List<Migration> migrations;
         
-        public MigrationFormatterStub() : this(new List<Migration>())
+        public MigrationRepositoryStub() : this(new List<Migration>())
         {
         }
         
-        public MigrationFormatterStub(List<Migration> migrations) : this(false, migrations)
+        public MigrationRepositoryStub(List<Migration> migrations) : this(false, migrations)
         {
         }
         
-        public MigrationFormatterStub(bool schemaExists, List<Migration> migrations)
+        public MigrationRepositoryStub(bool schemaExists, List<Migration> migrations)
         {
             this.schemaExists = schemaExists;
             this.migrations = migrations;
