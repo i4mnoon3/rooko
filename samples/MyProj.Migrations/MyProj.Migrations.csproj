@@ -52,12 +52,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddColumnToTable.cs" />
-    <Compile Include="CreateTable.cs" />
-    <Compile Include="DeleteFromTable.cs" />
-    <Compile Include="InsertValueToTable.cs" />
+    <Compile Include="20190129212349CreateTableUsers.cs" />
+    <Compile Include="20190129212511AddEmailToUsers.cs" />
+    <Compile Include="20190129212625InsertAdminToUsers.cs" />
+    <Compile Include="20190129212903UpdateAdminEmail.cs" />
+    <Compile Include="20190129213034DeleteUserAdmin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UpdateTable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

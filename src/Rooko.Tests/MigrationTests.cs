@@ -10,25 +10,25 @@ namespace Rooko.Tests
     [TestFixture]
     public class MigrationTests
     {
-        CreateTable createUsers;
-        AddColumnToTable addUsernameToUsers;
-        InsertValueToTable insertRootUser;
+        _20190129212349CreateTableUsers createUsers;
+        _20190129212511AddEmailToUsers addUsernameToUsers;
+        _20190129212625InsertAdminToUsers insertAdminUser;
         
         [SetUp]
         public void Setup()
         {
-            createUsers = new CreateTable();
+            createUsers = new _20190129212349CreateTableUsers();
             createUsers.Migrating += delegate(object sender, MigrationEventArgs e) {
                 Console.WriteLine(e.Message);
             };
             
-            addUsernameToUsers = new AddColumnToTable();
+            addUsernameToUsers = new _20190129212511AddEmailToUsers();
             addUsernameToUsers.Migrating += delegate(object sender, MigrationEventArgs e) {
                 Console.WriteLine(e.Message);
             };
             
-            insertRootUser = new InsertValueToTable();
-            insertRootUser.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
+            insertAdminUser = new _20190129212625InsertAdminToUsers();
+            insertAdminUser.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
         }
         
         [Test]
@@ -58,13 +58,13 @@ namespace Rooko.Tests
         [Test]
         public void TestInsertRootUserMigrate()
         {
-            insertRootUser.Migrate();
+            insertAdminUser.Migrate();
         }
         
         [Test]
         public void TestInsertRootUserRollback()
         {
-            insertRootUser.Rollback();
+            insertAdminUser.Rollback();
         }
     }
 }

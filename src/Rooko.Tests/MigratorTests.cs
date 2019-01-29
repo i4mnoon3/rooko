@@ -18,11 +18,11 @@ namespace Rooko.Tests
         public void Setup()
         {
             migrations = new List<Migration>();
-            migrations.Add(new CreateTable());
-            migrations.Add(new AddColumnToTable());
-            migrations.Add(new InsertValueToTable());
-            migrations.Add(new UpdateTable());
-//            migrations.Add(new DeleteFromTable());
+            migrations.Add(new _20190129212349CreateTableUsers());
+            migrations.Add(new _20190129212511AddEmailToUsers());
+            migrations.Add(new _20190129212625InsertAdminToUsers());
+            migrations.Add(new _20190129212903UpdateAdminEmail());
+            migrations.Add(new _20190129213034DeleteUserAdmin());
             
             formatters = new List<IMigrationFormatter>();
             formatters.Add(sqlMigrationFormatter);

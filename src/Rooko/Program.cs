@@ -72,34 +72,36 @@ namespace Rooko
             
             if (command == "generate") {
                 if (subCommand == "migration") {
-                    string fileName = string.Format("{1}{0}.cs", name, DateTime.Now.ToString("yyyyMMddHHmm"));
+                    string className = string.Format("{1}{0}", name, DateTime.Now.ToString("yyyyMMddHHmmss"));
+                    string fileName = string.Format("{0}.cs", className);
                     using (var s = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), fileName))) {
                         s.WriteLine(
                             @"using System;
+using System.Collections.Generic;
+using System.Data;
 using Rooko.Core;
 
 namespace Migrations
 {{
-	public class {0} : Migration
-	{{
-		public {0}() : base(""{1}"")
-		{{
-    	}}
-		
-		public override void Migrate()
-		{{
-			base.Migrate();
-		}}
-		
-		public override void Rollback()
-		{{
-			base.Rollback();
-		}}
-	}}
+    public class _{0} : Migration
+    {{
+        public _{0}() : base(""{1}"")
+        {{
+        }}
+        
+        public override void Migrate()
+        {{
+            base.Migrate();
+        }}
+        
+        public override void Rollback()
+        {{
+            base.Rollback();
+        }}
+    }}
 }}",
-                            name,
-                            Guid.NewGuid().ToString()
-                           );
+                            className,
+                            Guid.NewGuid().ToString());
                     }
                 }
             }
