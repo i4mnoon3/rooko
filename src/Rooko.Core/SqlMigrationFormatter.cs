@@ -34,7 +34,7 @@ namespace Rooko.Core
                 cols += c.IsPrimaryKey ? " PRIMARY KEY" : "";
                 cols += c.AutoIncrement ? " IDENTITY" : "";
                 cols += i++ < table.Columns.Count - 1 ? "," : "";
-                cols += Environment.NewLine;
+                cols += "\r\n";
             }
             return string.Format(@"CREATE TABLE {0}(
 {1})", table.Name, cols);
@@ -52,7 +52,7 @@ namespace Rooko.Core
             foreach (var c in columns) {
                 cols += "    " + c.Name + " " + c.GetDbType();
                 cols += i++ < columns.Length - 1 ? "," : "";
-                cols += i++ < columns.Length ? Environment.NewLine : "";
+                cols += i++ < columns.Length ? "\r\n" : "";
             }
             return string.Format(@"ALTER TABLE {0} ADD
 {1}", tableName, cols);
