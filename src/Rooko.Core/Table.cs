@@ -59,7 +59,7 @@ namespace Rooko.Core
         
         public void AddColumn(string name)
         {
-            AddColumn(name, "varchar(255)");
+            AddColumn(name, "VARCHAR(255)");
         }
         
         public void AddColumn(string name, string type)
@@ -81,7 +81,7 @@ namespace Rooko.Core
     
     public class Column
     {
-        public Column(string name) : this(name, "varchar(255)")
+        public Column(string name) : this(name, "VARCHAR(255)")
         {
         }
         

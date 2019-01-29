@@ -12,7 +12,7 @@ namespace Rooko.Tests
         {
             var c = new Column("name");
             Assert.AreEqual("name", c.Name);
-            Assert.AreEqual("varchar(255)", c.Type);
+            Assert.AreEqual("VARCHAR(255)", c.Type);
             Assert.AreEqual("name", c.ToString());
         }
     }

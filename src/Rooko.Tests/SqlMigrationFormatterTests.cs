@@ -14,8 +14,9 @@ namespace Rooko.Tests
         public void Setup()
         {
             f = new SqlMigrationFormatter("Data Source=.;Initial Catalog=test;Integrated Security=True;");
+            
             t = new Table("customers");
-            t.AddColumn("id", "integer", true, true, true);
+            t.AddColumn("id", "INT", true, true, true);
             t.AddColumn("name");
             t.AddColumn("address");
             t.AddColumn("phone");
@@ -23,12 +24,38 @@ namespace Rooko.Tests
             t.AddColumn("notes");
         }
         
+        [Test]
+        public void TestAddColumn()
+        {
+            var s = f.AddColumn("customers", "notes");
+            Assert.AreEqual(@"ALTER TABLE customers ADD
+    notes VARCHAR(255)", s);
+            s = f.AddColumn("customers", "notes", "status");
+            Console.WriteLine(s);
+            Assert.AreEqual(@"ALTER TABLE customers ADD
+    notes VARCHAR(255),
+    status VARCHAR(255)", s);
+        }
         
         [Test]
-        public void TestMethod()
+        public void TestDropTable()
+        {
+            var s = f.DropTable("customers");
+            Assert.AreEqual("DROP TABLE customers", s);
+        }
+        
+        [Test]
+        public void TestCreateTable()
         {
             var s = f.CreateTable(t);
-            Assert.AreEqual("", s);
+            Assert.AreEqual(@"CREATE TABLE customers(
+    id INT NOT NULL PRIMARY KEY IDENTITY,
+    name VARCHAR(255),
+    address VARCHAR(255),
+    phone VARCHAR(255),
+    email VARCHAR(255),
+    notes VARCHAR(255)
+)", s);
         }
     }
 }
