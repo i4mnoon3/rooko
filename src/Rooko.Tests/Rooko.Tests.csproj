@@ -102,6 +102,10 @@
     <Compile Include="TableTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\samples\MyProj.Migrations\MyProj.Migrations.csproj">
+      <Project>{DD8F6A91-72C9-46D1-AEEA-440123B99909}</Project>
+      <Name>MyProj.Migrations</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rooko.Core\Rooko.Core.csproj">
       <Project>{EAAB5645-57D7-4F59-95D4-A54E765C1447}</Project>
       <Name>Rooko.Core</Name>
