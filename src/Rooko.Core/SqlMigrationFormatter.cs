@@ -36,8 +36,9 @@ namespace Rooko.Core
                 cols += i++ < table.Columns.Count - 1 ? "," : "";
                 cols += "\r\n";
             }
-            return string.Format(@"CREATE TABLE {0}(
-{1})", table.Name, cols);
+            return string.Format(
+                "CREATE TABLE {0}(\r\n" +
+                "{1})", table.Name, cols);
         }
         
         public string DropTable(string tableName)
@@ -54,8 +55,9 @@ namespace Rooko.Core
                 cols += i++ < columns.Length - 1 ? "," : "";
                 cols += i++ < columns.Length ? "\r\n" : "";
             }
-            return string.Format(@"ALTER TABLE {0} ADD
-{1}", tableName, cols);
+            return string.Format(
+                "ALTER TABLE {0} ADD\r\n" +
+                "{1}", tableName, cols);
         }
         
         public string AddColumn(string tableName, params string[] columns)
