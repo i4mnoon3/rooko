@@ -10,3 +10,4 @@ src/Rooko.Core/Rooko.Core.csproj.user
 src/Rooko.Core/Rooko.Core.OpenCover.Settings
 src/Rooko/Rooko.csproj.user
 *.backup
+src/Rooko.Tests/OpenCover/coverage.xml
