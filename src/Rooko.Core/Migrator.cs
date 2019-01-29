@@ -21,6 +21,7 @@ namespace Rooko.Core
                     migrations.Add(m);
                 }
             }
+            this.repository = new MigrationRepository(formatter);
         }
         
         public Migrator(List<Migration> migrations, IMigrationFormatter formatter) : this(migrations, new MigrationRepository(formatter))

@@ -76,16 +76,16 @@ namespace Rooko.Tests
         public override void Migrate()
         {
             CreateTable(
-                "table",
+                "users",
                 new Column("id", DbType.Int32, 0, true, true, true),
-                new Column("some_column"),
-                new Column("another_column")
+                new Column("name"),
+                new Column("password")
                );
         }
         
         public override void Rollback()
         {
-            DropTable("table");
+            DropTable("users");
         }
     }
     
@@ -97,12 +97,12 @@ namespace Rooko.Tests
         
         public override void Migrate()
         {
-            AddColumn("table", new Column("another_column"));
+            AddColumn("users", new Column("email"));
         }
         
         public override void Rollback()
         {
-            RemoveColumn("table", "another_column");
+            RemoveColumn("users", "email");
         }
     }
     
@@ -115,9 +115,10 @@ namespace Rooko.Tests
         public override void Migrate()
         {
             Insert(
-                "table",
+                "users",
                 new[] {
-                    new KeyValuePair<string, object>("some_column", "some_value"),
+                    new KeyValuePair<string, object>("name", "admin"),
+                    new KeyValuePair<string, object>("password", "root"),
                 }
                );
         }
@@ -125,11 +126,11 @@ namespace Rooko.Tests
         public override void Rollback()
         {
             Delete(
-                "table",
+                "users",
                 new[] {
-                    new KeyValuePair<string, object>("some_column", "some_value"),
-                }
-               );
+                    new KeyValuePair<string, object>("name", "admin"),
+                    new KeyValuePair<string, object>("password", "root"),
+                });
         }
     }
     
@@ -142,27 +143,25 @@ namespace Rooko.Tests
         public override void Migrate()
         {
             Update(
-                "table",
+                "users",
                 new[] {
-                    new KeyValuePair<string, object>("some_column", "new_value")
+                    new KeyValuePair<string, object>("email", "admin@localhost.com")
                 },
                 new[] {
-                    new KeyValuePair<string, object>("id", 1)
-                }
-               );
+                    new KeyValuePair<string, object>("name", "admin")
+                });
         }
         
         public override void Rollback()
         {
             Update(
-                "table",
+                "users",
                 new[] {
-                    new KeyValuePair<string, object>("some_column", "some_value")
+                    new KeyValuePair<string, object>("email", "")
                 },
                 new[] {
-                    new KeyValuePair<string, object>("id", 1)
-                }
-               );
+                    new KeyValuePair<string, object>("name", "admin")
+                });
         }
     }
     
@@ -175,22 +174,21 @@ namespace Rooko.Tests
         public override void Migrate()
         {
             Delete(
-                "table",
+                "users",
                 new[] {
-                    new KeyValuePair<string, object>("id", "1"),
-                }
-               );
+                    new KeyValuePair<string, object>("name", "admin"),
+                });
         }
         
         public override void Rollback()
         {
             Insert(
-                "table",
+                "users",
                 new[] {
-                    new KeyValuePair<string, object>("id", "1"),
-                    new KeyValuePair<string, object>("some_column", "some_value"),
-                }
-               );
+                    new KeyValuePair<string, object>("name", "admin"),
+                    new KeyValuePair<string, object>("password", "root"),
+                    new KeyValuePair<string, object>("email", ""),
+                });
         }
     }
 }
