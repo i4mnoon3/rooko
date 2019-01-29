@@ -15,5 +15,6 @@ namespace Rooko.Tests
             Assert.AreEqual("VARCHAR(255)", c.GetDbType());
             Assert.AreEqual("name", c.ToString());
         }
+        
     }
 }
