@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using NUnit.Framework;
 using Rooko.Core;
 
@@ -76,7 +77,7 @@ namespace Rooko.Tests
         {
             CreateTable(
                 "table",
-                new Column("id", "integer", true, true, true),
+                new Column("id", DbType.Int32, 0, true, true, true),
                 new Column("some_column"),
                 new Column("another_column")
                );

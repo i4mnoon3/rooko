@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using NUnit.Framework;
 using Rooko.Core;
 
@@ -16,7 +17,7 @@ namespace Rooko.Tests
             f = new SqlMigrationFormatter("Data Source=.;Initial Catalog=test;Integrated Security=True;");
             
             t = new Table("customers");
-            t.AddColumn("id", "INT", true, true, true);
+            t.AddColumn("id", DbType.Int32, true, true, true);
             t.AddColumn("name");
             t.AddColumn("address");
             t.AddColumn("phone");
@@ -48,6 +49,7 @@ namespace Rooko.Tests
         public void TestCreateTable()
         {
             var s = f.CreateTable(t);
+            Console.WriteLine(s);
             Assert.AreEqual(@"CREATE TABLE customers(
     id INT NOT NULL PRIMARY KEY IDENTITY,
     name VARCHAR(255),

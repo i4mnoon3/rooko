@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using NUnit.Framework;
 using Rooko.Core;
 
@@ -13,10 +14,10 @@ namespace Rooko.Tests
         public void Setup()
         {
             items = new Table("items");
-            items.AddColumn("id", "integer", true, true, true);
+            items.AddColumn("id", DbType.Int32, true, true, true);
             items.AddColumn("name");
             items.AddColumn("description");
-            items.AddColumn("price", "double");
+            items.AddColumn("price", DbType.Double);
         }
         
         [Test]

@@ -59,17 +59,27 @@ namespace Rooko.Core
         
         public void AddColumn(string name)
         {
-            AddColumn(name, "VARCHAR(255)");
+            AddColumn(name, DbType.String);
         }
         
-        public void AddColumn(string name, string type)
+        public void AddColumn(string name, DbType type)
         {
-            AddColumn(name, type, false, false, false);
+            AddColumn(name, type, 0, false, false, false);
         }
         
-        public void AddColumn(string name, string type, bool primaryKey, bool notNull, bool autoIncrement)
+        public void AddColumn(string name, DbType type, int size)
         {
-            AddColumn(new Column(name, type, primaryKey, notNull, autoIncrement));
+            AddColumn(name, type, size, false, false, false);
+        }
+        
+        public void AddColumn(string name, DbType type, bool primaryKey, bool notNull, bool autoIncrement)
+        {
+            AddColumn(name, type, 0, primaryKey, notNull, autoIncrement);
+        }
+        
+        public void AddColumn(string name, DbType type, int size, bool primaryKey, bool notNull, bool autoIncrement)
+        {
+            AddColumn(new Column(name, type, size, primaryKey, notNull, autoIncrement));
         }
         
         public void AddColumn(Column column)
@@ -81,22 +91,23 @@ namespace Rooko.Core
     
     public class Column
     {
-        public Column(string name) : this(name, "VARCHAR(255)")
+        public Column(string name) : this(name, DbType.String, 255)
         {
         }
         
-        public Column(string name, string type) : this(name, type, false)
+        public Column(string name, DbType type, int size) : this(name, type, size, false)
         {
         }
         
-        public Column(string name, string type, bool primaryKey) : this(name, type, primaryKey, false, false)
+        public Column(string name, DbType type, int size, bool primaryKey) : this(name, type, size, primaryKey, false, false)
         {
         }
         
-        public Column(string name, string type, bool primaryKey, bool notNull, bool autoIncrement)
+        public Column(string name, DbType type, int size, bool primaryKey, bool notNull, bool autoIncrement)
         {
             this.Name = name;
             this.Type = type;
+            this.Size = size;
             this.IsPrimaryKey = primaryKey;
             this.NotNull = notNull;
             this.AutoIncrement = autoIncrement;
@@ -104,9 +115,11 @@ namespace Rooko.Core
         
         public Table Table { get; set; }
         
+        public int Size { get; set; }
+        
         public string Name { get; set; }
 
-        public string Type { get; set; }
+        public DbType Type { get; set; }
         
         public bool NotNull { get; set; }
 
@@ -115,6 +128,21 @@ namespace Rooko.Core
         public bool AutoIncrement { get; set; }
         
         public object Value { get; set; }
+        
+        public bool HasSize {
+            get { return Size > 0; }
+        }
+        
+        public string GetDbType()
+        {
+            if (Type == DbType.String && HasSize) {
+                return "VARCHAR(" + Size + ")";
+            } else if (Type == DbType.Int32) {
+                return "INT";
+            } else {
+                return "VARCHAR(255)";
+            }
+        }
         
         public override string ToString()
         {
