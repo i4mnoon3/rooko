@@ -54,7 +54,7 @@ namespace Rooko.Core
                     }
                     if (!repository.VersionExists(m.Version)) {
                         m.Migrate();
-                        repository.Save(m);
+                        repository.SaveMigration(m);
                     }
                 } catch (Exception ex) {
                     Console.WriteLine("Error: " + ex.Message);
@@ -91,7 +91,7 @@ namespace Rooko.Core
                             m.Updating += new EventHandler<TableEventArgs>(MigrationUpdating);
                             
                             m.Rollback();
-                            repository.Delete(m);
+                            repository.DeleteMigration(m);
                         } catch {
                             throw;
                         } finally {

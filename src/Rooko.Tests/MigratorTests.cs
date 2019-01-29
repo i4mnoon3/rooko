@@ -90,7 +90,7 @@ namespace Rooko.Tests
             return migrations.Find(x => x.Version == version) != null;
         }
         
-        public void Save(Migration migration)
+        public void SaveMigration(Migration migration)
         {
         }
         
@@ -103,7 +103,7 @@ namespace Rooko.Tests
             return migrations[migrations.Count - 1].Version;
         }
         
-        public void Delete(Migration migration)
+        public void DeleteMigration(Migration migration)
         {
             migrations.Remove(migration);
         }

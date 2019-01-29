@@ -33,13 +33,13 @@ namespace Rooko.Core
         
         bool VersionExists(string version);
         
-        void Save(Migration migration);
+        void SaveMigration(Migration migration);
         
         void BuildSchema();
         
         string ReadLatestVersion();
         
-        void Delete(Migration migration);
+        void DeleteMigration(Migration migration);
         
         void Delete(string tableName, ICollection<KeyValuePair<string, object>> @where);
         
@@ -88,13 +88,13 @@ namespace Rooko.Core
             return m;
         }
         
-        public void Save(Migration migration)
+        public void SaveMigration(Migration migration)
         {
             string query = string.Format("INSERT INTO schema_migrations(version) VALUES('{0}')", migration.Version);
             ExecuteNonQuery(query);
         }
         
-        public void Delete(Migration migration)
+        public void DeleteMigration(Migration migration)
         {
             string query = string.Format("DELETE FROM schema_migrations WHERE VERSION = '{0}'", migration.Version);
             ExecuteNonQuery(query);
