@@ -10,6 +10,8 @@ namespace Rooko.Tests
     public class MigratorTests
     {
         List<Migration> migrations;
+        List<IMigrationFormatter> formatters;
+        IMigrationFormatter sqlMigrationFormatter = new SqlMigrationFormatter(@"Server=.\SQLEXPRESS;Database=test;Trusted_Connection=True;");
         
         [SetUp]
         public void Setup()
@@ -19,31 +21,39 @@ namespace Rooko.Tests
             migrations.Add(new AddColumnToTable());
             migrations.Add(new InsertValueToTable());
             migrations.Add(new UpdateTable());
-            migrations.Add(new DeleteFromTable());
+//            migrations.Add(new DeleteFromTable());
+            
+            formatters = new List<IMigrationFormatter>();
+            formatters.Add(sqlMigrationFormatter);
+            formatters.Add(new SQLiteMigrationFormatter("data source=db.sqlite"));
         }
         
         [Test]
         [Ignore]
         public void TestMigrateFromAssembly()
         {
-            Migrator m = new Migrator(Assembly.GetExecutingAssembly(), new SQLiteMigrationFormatter("data source=db.sqlite"));
-            m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
-            m.Migrate();
+            foreach (var f in formatters) {
+                Migrator m = new Migrator(Assembly.GetExecutingAssembly(), f);
+                m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
+                m.Migrate();
+            }
         }
         
         [Test]
         [Ignore]
         public void TestRollbackFromAssembly()
         {
-            Migrator m = new Migrator(Assembly.GetExecutingAssembly(), new SQLiteMigrationFormatter("data source=db.sqlite"));
-            m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
-            m.Rollback();
+            foreach (var f in formatters) {
+                Migrator m = new Migrator(Assembly.GetExecutingAssembly(), f);
+                m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
+                m.Rollback();
+            }
         }
         
         [Test]
         public void TestMigrate()
         {
-            var m = new Migrator(migrations, new MigrationFormatterStub());
+            var m = new Migrator(migrations, sqlMigrationFormatter);
             m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
             m.Migrate();
         }
@@ -51,7 +61,7 @@ namespace Rooko.Tests
         [Test]
         public void TestRollback()
         {
-            var m = new Migrator(migrations, new MigrationFormatterStub(migrations));
+            var m = new Migrator(migrations, sqlMigrationFormatter);
             m.Migrating += (object sender, MigrationEventArgs e) => Console.WriteLine(e.Message);
             m.Rollback();
             m.Rollback();

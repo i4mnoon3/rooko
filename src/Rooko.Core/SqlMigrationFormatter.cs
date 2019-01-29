@@ -29,7 +29,7 @@ namespace Rooko.Core
             string cols = "";
             int i = 0;
             foreach (var c in table.Columns) {
-                cols += "    " + c.Name + " " + c.Type;
+                cols += "    " + c.Name + " " + c.GetDbType();
                 cols += c.NotNull ? " NOT NULL" : "";
                 cols += c.IsPrimaryKey ? " PRIMARY KEY" : "";
                 cols += c.AutoIncrement ? " IDENTITY" : "";
@@ -50,7 +50,7 @@ namespace Rooko.Core
             string cols = "";
             int i = 0;
             foreach (var c in columns) {
-                cols += "    " + c.Name + " " + c.Type;
+                cols += "    " + c.Name + " " + c.GetDbType();
                 cols += i++ < columns.Length - 1 ? "," : "";
                 cols += i++ < columns.Length ? Environment.NewLine : "";
             }
