@@ -29,13 +29,15 @@ namespace Rooko.Tests
         public void TestAddColumn()
         {
             var s = f.AddColumn("customers", "notes");
-            Assert.AreEqual(@"ALTER TABLE customers ADD
-    notes VARCHAR(255)", s);
+            Assert.AreEqual(
+                "ALTER TABLE customers ADD\r\n" +
+                "    notes VARCHAR(255)", s);
             s = f.AddColumn("customers", "notes", "status");
             Console.WriteLine(s);
-            Assert.AreEqual(@"ALTER TABLE customers ADD
-    notes VARCHAR(255),
-    status VARCHAR(255)", s);
+            Assert.AreEqual(
+                "ALTER TABLE customers ADD\r\n" +
+                "    notes VARCHAR(255),\r\n" +
+                "    status VARCHAR(255)", s);
         }
         
         [Test]
@@ -50,14 +52,16 @@ namespace Rooko.Tests
         {
             var s = f.CreateTable(t);
             Console.WriteLine(s);
-            Assert.AreEqual(@"CREATE TABLE customers(
-    id INT NOT NULL PRIMARY KEY IDENTITY,
-    name VARCHAR(255),
-    address VARCHAR(255),
-    phone VARCHAR(255),
-    email VARCHAR(255),
-    notes VARCHAR(255)
-)", s);
+                
+            Assert.AreEqual(
+                "CREATE TABLE customers(\r\n" +
+                "    id INT NOT NULL PRIMARY KEY IDENTITY,\r\n" +
+                "    name VARCHAR(255),\r\n" +
+                "    address VARCHAR(255),\r\n" +
+                "    phone VARCHAR(255),\r\n" +
+                "    email VARCHAR(255),\r\n" +
+                "    notes VARCHAR(255)\r\n" +
+                ")", s);
         }
     }
 }
