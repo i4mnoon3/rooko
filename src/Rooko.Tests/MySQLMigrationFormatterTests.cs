@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using NUnit.Framework;
 using Rooko.Core;
 
@@ -15,7 +16,7 @@ namespace Rooko.Tests
 		public void Setup()
 		{
 			table = new Table("users");
-			table.AddColumn("id", "integer", true, true, true);
+			table.AddColumn("id", DbType.Int32, true, true, true);
 			table.AddColumn("name");
 			table.AddColumn("password");
 			

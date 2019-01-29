@@ -1,11 +1,14 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+# SharpDevelop 4.4
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rooko", "Rooko\Rooko.csproj", "{837BFA52-1246-428F-B5AF-70CEEBA7D888}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rooko.Core", "Rooko.Core\Rooko.Core.csproj", "{EAAB5645-57D7-4F59-95D4-A54E765C1447}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rooko.Tests", "Rooko.Tests\Rooko.Tests.csproj", "{EAFD4123-63B9-4B7A-8C22-0E9E0CE20F37}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyProj.Migrations", "..\samples\MyProj.Migrations\MyProj.Migrations.csproj", "{DD8F6A91-72C9-46D1-AEEA-440123B99909}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +42,14 @@ Global
 		{EAFD4123-63B9-4B7A-8C22-0E9E0CE20F37}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EAFD4123-63B9-4B7A-8C22-0E9E0CE20F37}.Release|x86.ActiveCfg = Release|x86
 		{EAFD4123-63B9-4B7A-8C22-0E9E0CE20F37}.Release|x86.Build.0 = Release|x86
+		{DD8F6A91-72C9-46D1-AEEA-440123B99909}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD8F6A91-72C9-46D1-AEEA-440123B99909}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD8F6A91-72C9-46D1-AEEA-440123B99909}.Debug|x86.Build.0 = Debug|Any CPU
+		{DD8F6A91-72C9-46D1-AEEA-440123B99909}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DD8F6A91-72C9-46D1-AEEA-440123B99909}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD8F6A91-72C9-46D1-AEEA-440123B99909}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD8F6A91-72C9-46D1-AEEA-440123B99909}.Release|x86.Build.0 = Release|Any CPU
+		{DD8F6A91-72C9-46D1-AEEA-440123B99909}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
