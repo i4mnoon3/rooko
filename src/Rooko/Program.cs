@@ -115,18 +115,21 @@ namespace Migrations
 			Console.WriteLine(
 				@"Rooko is a simple database migration tool for .NET.
 
-  Usage:
-    rook -v
-    rooko command [library] [connection_string] [provider_name]
+  Usage: rooko [command] [library] [connection_string] [provider_name]
+    -v          Prints the version of this executable
+    -h          Prints this usage information
+    
+    migrate     Push the migration library to the given connection
+    rollback    Triggers the rollback migration library using the connection
+    generate    Generates a migration class
    
   Examples:
-    rooko migrate ""Rooko.Tests.dll"" ""Server=.;Database=test;Trusted_Connection=True;"" ""System.Data.SqlClient""
-    rooko rollback ""Rooko.Tests.dll"" ""Server=.;Database=test;Trusted_Connection=True;"" ""System.Data.SqlClient""
+    rooko migrate ""MyProj.Migrations.dll"" ""Server=.;Database=test;Trusted_Connection=True;"" ""System.Data.SqlClient""
+    rooko rollback ""MyProj.Migrations.dll"" ""Server=.;Database=test;Trusted_Connection=True;"" ""System.Data.SqlClient""
     rooko generate migration ""CreateUsers""
 
   Further Information:
-    https://github.com/iescarro/rooko
-"
+    https://github.com/iescarro/rooko"
 			);
 		}
 		
