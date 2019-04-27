@@ -13,3 +13,4 @@ src/Rooko/Rooko.csproj.user
 src/Rooko.Tests/OpenCover/coverage.xml
 /samples/**/obj
 /samples/**/bin
+.vs
