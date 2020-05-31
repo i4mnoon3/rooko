@@ -1,4 +1,4 @@
-# Rooko Beta
+# rooko
 
 ![build](https://ci.appveyor.com/api/projects/status/qnvi3yqiiv139nkn?svg=true)
 
