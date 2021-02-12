@@ -9,7 +9,7 @@ namespace Rooko
 {
     class Program
     {
-        private static void Main(string[] args)
+        static void Main(string[] args)
         {
             if (args.Length == 4) {
                 MigrateOrRollback(args);
@@ -28,7 +28,6 @@ namespace Rooko
         {
             string command = args[0], assembly = args[1], connectionString = args[2], providerName = args[3];
 
-            Console.WriteLine(Path.Combine(Directory.GetCurrentDirectory(), assembly));
             var m = new Migrator(Assembly.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), assembly)), GetMigrationFormatter(providerName, connectionString));
             m.Migrating += delegate(object sender, MigrationEventArgs e) {
                 Console.WriteLine(e.Message);
