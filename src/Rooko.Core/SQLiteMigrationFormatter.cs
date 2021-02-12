@@ -30,20 +30,20 @@ namespace Rooko.Core
 			string cols = "";
 			int i = 1;
 			foreach (var c in table.Columns) {
-				string notNull = c.NotNull ? " NOT NULL" : "";
-				string primaryKey = c.IsPrimaryKey ? " PRIMARY KEY" : "";
+				string notNull = c.NotNull ? " not null" : "";
+				string primaryKey = c.IsPrimaryKey ? " primary key" : "";
 				cols += string.Format("  {0} {1}{2}{3}", c.Name, c.Type, notNull, primaryKey);
 				cols += i++ < table.Columns.Count ? "," : "";
 				cols += Environment.NewLine;
 			}
-			return string.Format(@"CREATE TABLE {0}(
+			return string.Format(@"create table {0}(
 {1}
 );", table.Name, cols);
 		}
 		
 		public string DropTable(string tableName)
 		{
-			return string.Format("DROP TABLE {0};", tableName);
+			return string.Format("drop table {0};", tableName);
 		}
 		
 		public string AddColumn(string tableName, params Column[] columns)
