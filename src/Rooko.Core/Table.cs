@@ -95,11 +95,19 @@ namespace Rooko.Core
         {
         }
         
+        public Column(string name, DbType type) : this(name, type, 0)
+        {
+        }
+        
         public Column(string name, DbType type, int size) : this(name, type, size, false)
         {
         }
         
         public Column(string name, DbType type, int size, bool primaryKey) : this(name, type, size, primaryKey, false, false)
+        {
+        }
+        
+        public Column(string name, DbType type, bool primaryKey, bool notNull, bool autoIncrement) : this(name, type, 0, primaryKey, notNull, autoIncrement)
         {
         }
         
